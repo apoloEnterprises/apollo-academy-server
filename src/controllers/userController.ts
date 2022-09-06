@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-
+const db = require('../database/db')
 class userController {
   async index (req: Request, res: Response) {
     const {
-      categoria, opt1 
+      categoriaIncial, 
     } = await req.body;
 
 
@@ -25,17 +25,23 @@ class userController {
       {'Area': ['Mobile Games', 'Desktop']}
     ];
 
+    type sqlType = string
 
-    if(categoria) {
-      switch (categoria) {
+    const sql: sqlType = `INSERT INTO usuarios (categoriaIncial) VALUES (?)`
+
+
+    if(categoriaIncial) {
+      db.query('')
+
+      switch (categoriaIncial) {
         case 'tech': 
-        res.send(`categoria tech: ${categoria}, ${tech.frontEnd}`)
+        res.send(`conteudo em tech: ${tech.conteudo}, ${tech.frontEnd}`)
         break;
         case 'design': 
-        res.send(`categoria desigh: ${categoria}`)
+        res.send(`categoriaIncial desigh: ${categoriaIncial}`)
         break;
         case 'game': 
-        res.send(`categoria game: ${categoria}`)
+        res.send(`categoriaIncial game: ${categoriaIncial}`)
         break;
         default: 
         console.log('idk man');
@@ -47,8 +53,34 @@ class userController {
       //   console.log(tech.linguagens[0]);
       // }
     }
-
   }
+
+  async select(req: Request, res: Response) {
+    const {
+      nomeDeUsuario,
+      email, 
+      senha
+    } = req.body;
+
+    type sqlType = string;
+
+    const sql: sqlType = `INSERT INTO usuarios 
+    (nomeDeUsuario, email, senha) VALUES (?,?,?)`;
+
+    if(nomeDeUsuario && email && senha) {
+      db.query(`SELECT nomeDeUsuario from usuarios where nomeDeUsuario=?`, [nomeDeUsuario], function (err: Error, result: any) :void {
+        if (err) throw err;
+        if (result.length > 0) {
+          res.status(409).send('User Already Registered.')
+        } else {
+          db.query(sql, [nomeDeUsuario, email, senha], async function (err: Error, result: any) {
+            if (err) throw err;
+            res.status(200).send(`User registered successfully: ${result}`);
+          })
+        }
+    })
+    
+    }}
 }
 
 module.exports = new userController();
