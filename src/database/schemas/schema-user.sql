@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `senha` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `trofeus` varchar(255) NOT NULL,
-  `categoriaIncial` varchar(255) NOT NULL,
+  `categoria` varchar(255) NOT NULL,
+  `subCategoria1` varchar(255) NOT NULL,
+  `subCategoria2` varchar(255) NOT NULL,
+  `subCategoria3` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
