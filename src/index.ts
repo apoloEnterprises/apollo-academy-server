@@ -9,7 +9,6 @@ const port = 3010;
 
 app.use(bodyParser.json());
 
-
 app.get('/api', (req: Request, res: Response) => {
   res.status(200).send('test')
 });
