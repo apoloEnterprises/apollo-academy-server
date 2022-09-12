@@ -34,6 +34,8 @@ class userController {
             }); 
           })
       })
+    } else {
+      res.status(404).send('User not found.');
     }
   };
 
@@ -73,14 +75,11 @@ class userController {
     if (err) throw err;
     if (result[0]?.nomeDeUsuario.length > 0 ) {
       res.status(401).send('Username already in use.');
-      console.log(result[0].nomeDeUsuario);
     }
     db.query(`SELECT email FROM usuarios WHERE email=?`, [email], async function (err: Error, result: ResultQuey[]) {
       if (err) throw err;
       if ( result[0]?.email.length > 0 ) {
         res.status(401).send('Email already in use.');
-        console.log(result[0].email);
-        
       } else {
         db.query(`INSERT INTO usuarios 
         (nomeDeUsuario, email, senha, trofeus, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?, ?, ?,?)`, [nomeDeUsuario, email, senha, otherData.trofeus, otherData.categoria, otherData.subCategoria1, otherData.subCategoria2, otherData.subCategoria3], async function (err: Error, result: ResultQuey[]) {
