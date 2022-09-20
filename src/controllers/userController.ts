@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 const db = require('../database/db');
-const userRepository = require('../repository/userRepository')
+const userRepository = require('../repository/userRepository');
+
+// user first actions - login, sign up, first choice of cateogries etc..
 class userController {
  public async index (req: Request, res: Response) {
     const {
@@ -37,7 +39,7 @@ class userController {
     } else {
       res.status(404).send('User not found.');
     }
-  };
+  }
 
   public async select(req: Request, res: Response) {
     const {
@@ -55,7 +57,7 @@ class userController {
       subCategoria1: number,
       subCategoria2: number,
       subCategoria3: number
-    };
+    }
 
     interface NumData {
       trofeus: number,
@@ -69,7 +71,7 @@ class userController {
 
     if (!nomeDeUsuario) {
       res.status(404).send('No user provided.')
-    };
+    }
 
     db.query(`SELECT nomeDeUsuario FROM usuarios WHERE nomeDeUsuario=?`, [nomeDeUsuario], function (err: Error, result: ResultQuey[]) {
     if (err) throw err;
@@ -88,23 +90,7 @@ class userController {
         })}
      })}
     ) 
-  };
-
-  // public async getCategory (req: Request, res: Response) {
-  //   const {
-  //     subCategoria1,
-  //     subCategoria2,
-  //     subCategoria3,
-  //     nomeDeUsuario,
-  //     categoria,
-  //     } = await req.body;
-
-
-
-  //     if (categoria && nomeDeUsuario && subCategoria3 && subCategoria1 && subCategoria2) {
-
-  //     }
-  // }
+  }
 }
 
 module.exports = new userController();
