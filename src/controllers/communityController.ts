@@ -131,34 +131,63 @@ class communityController {
     }
   }
 
+  async getPostTotalAnswersNumber (req: Request, res: Response) {
+    const {
+      id
+    } = await req.body;
+
+    type sqlType = string;
+
+    interface ResultQuey {
+      categoria: string,
+    }
+
+    const sql: sqlType = `
+    SELECT *
+    FROM respostas
+    WHERE pergunta_ID=?
+    `;
+
+    if (id) {
+      db.query(sql, [id], 
+        async function (err: Error, result: ResultQuey[]) {
+          if (err) throw err;
+          const postCount = result.length;
+          res.status(200).json({
+            numero_respostas: `${postCount}`
+          })
+        })
+    } else {
+      res.status(404).send('Answers not found.')
+    }
+  }
+
   public async postAnwser(req: Request, res: Response) {
     const {
       pergunta_ID,
       autor_ID,
       resposta_Txt,
-      likes,
       } = await req.body;
-
  
       if (!autor_ID) {
         res.status(404).send('Error sir')
       }
 
+      const id = uuidv4();
       interface ResultQuey {
         id: string,
         autor_ID: string,
         pergunta_ID: string,
         resposta_Txt: string,
-        likes: number,
       }
       
       type sqlType = string;
 
       const sql: sqlType = `INSERT INTO respostas 
-      (pergunta_ID, autor_ID, resposta_Txt, likes) VALUES (?,?,?,?)
+      (id, pergunta_ID, autor_ID, resposta_Txt) VALUES (?,?,?, ?)
       `;
 
-        db.query(sql, [pergunta_ID, autor_ID, resposta_Txt, likes], function (err: Error, result: ResultQuey[]) {
+        db.query(sql, [id, pergunta_ID, autor_ID, resposta_Txt], function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
           res.status(200).send(result[0])
         })
@@ -185,35 +214,17 @@ class communityController {
           autor_ID: string,
           pergunta_ID: string,
           resposta_Txt: string,
-          likes: number,
-        }  
+        }
 
         const sqlAnswer: sqlType = `
-        SELECT data, 
-        autor_ID, resposta_Txt,
-        likes
+        SELECT *
         FROM respostas
         WHERE pergunta_ID=?
         `;
 
-
-        db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[], rows: any) {
+        db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
           if (err) throw err;
         });
-
-        // function handleAnswerResult() {
-        //   return new Promise((resolve, reject) => {
-        //     db.query(sqlAnswer, (err: Error, result: ResultQueyAnswer[]) => {
-        //       if (err) {
-        //         reject(err);
-        //       }
-        //       else {
-        //         resolve(result);
-        //       }
-        //     });
-        //   });
-        // }
-
     
         const sql: sqlType = `
         SELECT pergunta_Txt, 
@@ -229,17 +240,48 @@ class communityController {
              async function (err: Error, result: ResultQuey[]) {
               if (err) throw err;
               const postResult = result
-              db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[], rows: any) {
+              db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
                 if (err) throw err;
                 res.status(200).json({
                   pergunta: postResult,
-                  resposta: result
+                  respostas: result
                 });
               });
             });
         } else {
           res.status(404).send('Question not found.')
         }
+      }
+
+      public async postComment(req: Request, res: Response) {
+        const {
+          resposta_ID,
+          autor_ID,
+          comentario_Txt
+        } = req.body;
+
+        if (!autor_ID) {
+          res.status(404).send('No user id provided.')
+        }
+  
+        const id = uuidv4();
+        interface ResultQuey {
+          autor_ID: string,
+          resposta_ID: string,
+          comentario_Txt: string,
+        }
+
+        type sqlType = string;
+
+        const sql: sqlType = `INSERT INTO comentarios 
+        (id, resposta_ID, autor_ID, comentario_Txt) VALUES (?,?,?, ?)`
+
+        db.query(sql, [id, resposta_ID, autor_ID, comentario_Txt], function (err: Error, result: ResultQuey[]) {
+          if (err) throw err;
+          res.status(200).json({
+            comentario: JSON.stringify(result[0])
+          })
+        })
       }
 }
 
