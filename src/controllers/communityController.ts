@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 const db = require('../database/db');
-
+const { v4: uuidv4 } = require('uuid');
 // all community posts, comments, reactions, lists etc..
 
 class communityController {
  public async postIndex(req: Request, res: Response) {
     const {
-      data,
       autor_ID,
       categoria,
       subCategoria1,
@@ -21,6 +20,7 @@ class communityController {
         res.status(404).send('Error sir')
       }
 
+      const id = uuidv4();
       interface ResultQuey {
         id: string,
         autor_ID: string,
@@ -35,12 +35,12 @@ class communityController {
       type sqlType = string;
 
       const sql: sqlType = `INSERT INTO perguntas 
-      (data, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?, ?, ?,?)
+      (id, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?, ?, ?, ?)
       `;
 
-        db.query(sql, [data, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1, subCategoria2, subCategoria3], async function (err: Error, result: ResultQuey[]) {
+        db.query(sql, [id, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1, subCategoria2, subCategoria3], async function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
-          res.status(200).send('ok')
+          res.status(200).send(JSON.stringify(result[0]))
         })
       }
       
@@ -133,7 +133,6 @@ class communityController {
 
   public async postAnwser(req: Request, res: Response) {
     const {
-      data,
       pergunta_ID,
       autor_ID,
       resposta_Txt,
@@ -156,10 +155,10 @@ class communityController {
       type sqlType = string;
 
       const sql: sqlType = `INSERT INTO respostas 
-      (data, pergunta_ID, autor_ID, resposta_Txt, likes) VALUES (?,?,?,?,?)
+      (pergunta_ID, autor_ID, resposta_Txt, likes) VALUES (?,?,?,?)
       `;
 
-        db.query(sql, [data, pergunta_ID, autor_ID, resposta_Txt, likes], async function (err: Error, result: ResultQuey[]) {
+        db.query(sql, [pergunta_ID, autor_ID, resposta_Txt, likes], function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
           res.status(200).send(result[0])
         })
@@ -171,7 +170,6 @@ class communityController {
         } = await req.body;
     
         type sqlType = string;
-    
         interface ResultQuey {
           id: string,
           autor_ID: string,
@@ -192,16 +190,30 @@ class communityController {
 
         const sqlAnswer: sqlType = `
         SELECT data, 
-        pergunta_ID, autor_ID, resposta_Txt,
+        autor_ID, resposta_Txt,
         likes
         FROM respostas
         WHERE pergunta_ID=?
         `;
 
-        const [answers] = db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+
+        db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[], rows: any) {
           if (err) throw err;
-          return JSON.stringify(result)
-        })
+        });
+
+        // function handleAnswerResult() {
+        //   return new Promise((resolve, reject) => {
+        //     db.query(sqlAnswer, (err: Error, result: ResultQueyAnswer[]) => {
+        //       if (err) {
+        //         reject(err);
+        //       }
+        //       else {
+        //         resolve(result);
+        //       }
+        //     });
+        //   });
+        // }
+
     
         const sql: sqlType = `
         SELECT pergunta_Txt, 
@@ -211,14 +223,20 @@ class communityController {
         WHERE id=?
         `;
 
+
         if (id) {
           db.query(sql, [id], 
-            async function (err: Error, result: ResultQuey[]) {
+             async function (err: Error, result: ResultQuey[]) {
               if (err) throw err;
-              res.status(200).json(`pergunta: ${result} | resposta: ${answers}`);
-              console.log(answers);
-              
-            })
+              const postResult = result
+              db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[], rows: any) {
+                if (err) throw err;
+                res.status(200).json({
+                  pergunta: postResult,
+                  resposta: result
+                });
+              });
+            });
         } else {
           res.status(404).send('Question not found.')
         }

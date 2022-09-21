@@ -3,7 +3,7 @@ USE `apollo`;
 
 
 CREATE TABLE IF NOT EXISTS `perguntas` (
-  `id` BINARY(16) default (UUID_TO_BIN(UUID())),
+  `id` varchar(100) NOT NULL,
   `data` TIMESTAMP DEFAULT NOW(),
   `autor_ID` varchar(100) NOT NULL,
   `pergunta_Txt` varchar(255) NOT NULL,
@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS `respostas` (
   `autor_ID` varchar(100) NOT NULL,
   `resposta_Txt` varchar(255) NOT NULL,
   `likes` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`pergunta_ID`) REFERENCES perguntas(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `comentarios` (

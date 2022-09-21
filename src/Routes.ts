@@ -12,12 +12,11 @@ router.post('/sign-up', userController.select);
 router.post('/community/create-post', communityController.postIndex);
 router.get('/community/post/:id', communityController.getUserPosts);
 router.post('/community/post-by-category', communityController.getPostByCategory);
+
+// number of all posts in that category
 router.post('/community/post-total', communityController.getPostNumber);
+
 router.post('/community/post-create-answer', communityController.postAnwser);
 router.post('/community/post-answer', communityController.getPostAndAnswers);
-// getPostNumber
-// router.post('/getCategory', userController.select);
-
-// router.post('/user/:id', userController.select);
 
 module.exports = router;
