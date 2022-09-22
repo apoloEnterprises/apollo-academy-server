@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS `perguntas` (
   `autor_ID` varchar(100) NOT NULL,
   `pergunta_Txt` varchar(255) NOT NULL,
   `pergunta_Descr` varchar(255) NOT NULL,
+  `melhor_resposta_ID` varchar(255) NOT NULL,
+  `qnt_respostas` int(11) DEFAULT 0,
   `categoria` varchar(20) NOT NULL,
   `subCategoria1` varchar(20) NOT NULL,
   `subCategoria2` varchar(20) NOT NULL,

@@ -9,10 +9,6 @@ const port = 3010;
 
 app.use(bodyParser.json());
 
-app.get('/api', (req: Request, res: Response) => {
-  res.status(200).send('test')
-});
-
 app.use(routes);
 
 app.listen(port, () => console.log('online'));

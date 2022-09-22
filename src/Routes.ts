@@ -3,10 +3,12 @@ const { Router } = require('express');
 const router = Router();
 const userController = require('./controllers/userController');
 const communityController = require('./controllers/communityController');
+const rankingsController = require('./controllers/rankingsController')
 
 // --------------------sign up routes-------------------------
 router.put('/sign-up/category', userController.index);
 router.post('/sign-up', userController.select);
+router.post('/sign-in', userController.getIn);
 // --------------------**********------------------------
 
 // --------------------community routes-------------------------
@@ -24,5 +26,9 @@ router.post('/community/post-create-comment', communityController.postComment);
 router.post('/community/post-answer', communityController.getPostAndAnswers);
 // --------------------**********------------------------
 
+// --------------------ranking and level routes-------------------------
+router.post('/level-up', rankingsController.userLevelUp);
+router.post('/level/insert-exp', rankingsController.insertXP);
+// --------------------**********------------------------
 
 module.exports = router;

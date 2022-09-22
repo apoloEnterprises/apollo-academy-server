@@ -14,7 +14,6 @@ class communityController {
       pergunta_Txt,
       pergunta_Descr,
       } = await req.body;
-
  
       if (!autor_ID) {
         res.status(404).send('Error sir')
@@ -84,7 +83,7 @@ class communityController {
     }
 
     const sql: sqlType = `
-    SELECT pergunta_Txt, pergunta_Descr, categoria, subCategoria1, subCategoria2
+    SELECT *
     FROM perguntas
     WHERE categoria=?
     `;
@@ -133,7 +132,8 @@ class communityController {
 
   async getPostTotalAnswersNumber (req: Request, res: Response) {
     const {
-      id
+      id,
+      
     } = await req.body;
 
     type sqlType = string;
@@ -146,6 +146,16 @@ class communityController {
     SELECT *
     FROM respostas
     WHERE pergunta_ID=?
+    `;
+
+    const sqlUpdate: sqlType = `UPDATE usuarios
+    SET 
+        categoria=?,
+        subCategoria1=?,
+        subCategoria2=?,
+        subCategoria3=?
+    WHERE 
+        nomeDeUsuario=?
     `;
 
     if (id) {
@@ -187,10 +197,32 @@ class communityController {
       (id, pergunta_ID, autor_ID, resposta_Txt) VALUES (?,?,?, ?)
       `;
 
+      const sqlGetNumberAnswers: sqlType = `
+      SELECT *
+      FROM respostas
+      WHERE pergunta_ID=?`;
+
+      const sqlUpdate: sqlType = `UPDATE perguntas
+      SET 
+        qnt_respostas
+      WHERE 
+        id=?`;
+
         db.query(sql, [id, pergunta_ID, autor_ID, resposta_Txt], function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
-          res.status(200).send(result[0])
-        })
+          const queryResult = result[0];
+          db.query(sqlGetNumberAnswers, [pergunta_ID], 
+            async function (err: Error, result: ResultQuey[]) {
+              if (err) throw err;
+              const postCount = result.length;
+              const numero_respostas = `${postCount}`;
+              db.query(sqlUpdate, [pergunta_ID, numero_respostas], 
+                async function (err: Error, result: ResultQuey[]) {
+                 if (err) throw err;
+                  res.status(200).send(queryResult)
+                });
+            })}  
+        )
       }
 
       public async getPostAndAnswers (req: Request, res: Response) {
@@ -221,10 +253,6 @@ class communityController {
         FROM respostas
         WHERE pergunta_ID=?
         `;
-
-        db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
-          if (err) throw err;
-        });
     
         const sql: sqlType = `
         SELECT pergunta_Txt, 
@@ -240,12 +268,17 @@ class communityController {
              async function (err: Error, result: ResultQuey[]) {
               if (err) throw err;
               const postResult = result
-              db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
-                if (err) throw err;
-                res.status(200).json({
-                  pergunta: postResult,
-                  respostas: result
-                });
+                db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+                  if (err) throw err;
+                  const postAnswer = result
+                    db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+                      if (err) throw err;
+                      const answerComment = result
+                      res.status(200).json({
+                        pergunta: postResult,
+                        respostas: postAnswer
+                      });
+                  });
               });
             });
         } else {
@@ -279,10 +312,61 @@ class communityController {
         db.query(sql, [id, resposta_ID, autor_ID, comentario_Txt], function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
           res.status(200).json({
-            comentario: JSON.stringify(result[0])
+            comentario: JSON.stringify(result)
           })
         })
       }
+
+      // public async getAnswerAndComment (req: Request, res: Response) {
+      //   const {
+      //     id
+      //   } = await req.body;
+    
+      //   type sqlType = string;
+      //   interface ResultQuey {
+      //     id: string,
+      //     autor_ID: string,
+      //     pergunta_Txt: string,
+      //     pergunta_Descr: string,
+      //     categoria: number,
+      //     subCategoria1: number,
+      //     subCategoria2: number,
+      //     subCategoria3: number
+      //   }
+
+      //   interface ResultQueyAnswer {
+      //     autor_ID: string,
+      //     pergunta_ID: string,
+      //     resposta_Txt: string,
+      //   }
+
+      //   const sqlAnswer: sqlType = `
+      //   SELECT *
+      //   FROM respostas
+      //   WHERE pergunta_ID=?
+      //   `;
+
+      //   db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+      //     if (err) throw err;
+      //   });
+
+      //   if (id) {
+      //     db.query(sqlAnswer, [id], 
+      //        async function (err: Error, result: ResultQuey[]) {
+      //         if (err) throw err;
+      //         const answerResult = result
+      //         db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+      //           if (err) throw err;
+      //           res.status(200).json({
+      //             pergunta: answerResult,
+      //             respostas: {resposta: result, comentario}
+      //           });
+      //         });
+      //       });
+      //   } else {
+      //     res.status(404).send('Question not found.')
+      //   }
+      // }
 }
 
 module.exports = new communityController();

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 const db = require('../database/db');
 const userRepository = require('../repository/userRepository');
+const { v4: uuidv4 } = require('uuid');
 
 // user first actions - login, sign up, first choice of cateogries etc..
 class userController {
@@ -59,6 +60,8 @@ class userController {
       subCategoria3: number
     }
 
+    const id = uuidv4();
+
     interface NumData {
       trofeus: number,
       categoria: number,
@@ -83,14 +86,56 @@ class userController {
       if ( result[0]?.email.length > 0 ) {
         res.status(401).send('Email already in use.');
       } else {
-        db.query(`INSERT INTO usuarios 
-        (nomeDeUsuario, email, senha, trofeus, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?, ?, ?,?)`, [nomeDeUsuario, email, senha, otherData.trofeus, otherData.categoria, otherData.subCategoria1, otherData.subCategoria2, otherData.subCategoria3], async function (err: Error, result: ResultQuey[]) {
+        db.query(`INSERT INTO usuarios
+        (id, nomeDeUsuario, email, senha, trofeus, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?,?, ?,?,?)`, [id, nomeDeUsuario, email, senha, otherData.trofeus, otherData.categoria, otherData.subCategoria1, otherData.subCategoria2, otherData.subCategoria3], async function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
           res.status(200).send(`User created successfully: ${nomeDeUsuario}`)      
         })}
      })}
     ) 
   }
+
+  public async getIn(req: Request, res: Response) {
+    const {
+      nomeDeUsuario,
+      senha
+    } = req.body;
+
+    interface ResultQuey {
+      id: number,
+      nomeDeUsuario: string,
+      senha: string,
+      email: string,
+    }
+
+    type sqlType = string;
+
+    const sql: sqlType = `
+    SELECT nomeDeUsuario, email, senha
+    FROM usuarios
+    WHERE nomeDeUsuario=?
+    `;
+
+    if(!nomeDeUsuario) {
+      res.status(404).send('Email or username not found.');
+    }
+
+    db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
+      if(err) throw err;
+      const ResultUsername = result[0].nomeDeUsuario;
+      const ResultPassword = result[0].senha;
+
+      if(nomeDeUsuario === ResultUsername && senha === ResultPassword) {
+        res.status(200).send({
+          status: `logged in successfully as ${nomeDeUsuario}`
+        })
+      } else {
+        res.status(404).send({
+          status: 'Username or password is not valid.'
+        })
+      }
+    });
+   }
 }
 
 module.exports = new userController();
