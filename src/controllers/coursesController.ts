@@ -21,21 +21,27 @@ class coursesController {
       }
 
       const sqlWatched: typeof sqlType = `
-      SELECT aula_assistindo, timestamp
+      SELECT *
       FROM usuario_curso
       WHERE id_usuario=?
       `
+      
       db.query(sqlWatched, [id_usuario], async function (err: Error, result: typeof ResultQueryWatched[]) {
         if (err) throw err;
+        const result_user_course = result
+        const id_curso = result[0]?.id_curso;
         if(result.length <= 0) {
           res.status(200).send({
             watching: false
           });
         } else {
+          db.query('SELECT * FROM curso WHERE id=?', [id_curso], async function (err: Error, result: typeof ResultQueryWatched[]) {
           res.status(200).json({
             watching: true,
-            result: result
+            usuario_curso: result_user_course,
+            curso: result
           })
+          }) 
         }
       })
 }
@@ -82,9 +88,11 @@ public async insertWatching(req: Request, res: Response) {
     const {
       id_usuario,
       id_curso,
+      foto_capa,
       aula_assistida,
       aula_assistindo,
-      timestamp
+      timestamp,
+      total_timestamp,
       } = await req.body;
 
       if(!id_usuario) {
@@ -95,11 +103,11 @@ public async insertWatching(req: Request, res: Response) {
 
       const sqlWatched: typeof sqlType = `
       INSERT INTO usuario_curso
-      (id_usuario, id_curso, aula_assistida, aula_assistindo, timestamp)
-      VALUES (?,?,?,?,?) 
+      (id_usuario, id_curso, foto_capa, aula_assistida, aula_assistindo, timestamp, total_timestamp)
+      VALUES (?,?,?,?,?, ?, ?) 
       `
       
-      db.query(sqlWatched, [id_usuario, id_curso, aula_assistida, aula_assistindo, timestamp], async function (err: Error, result: typeof ResultQueryInsertWacting[]) {
+      db.query(sqlWatched, [id_usuario, id_curso, foto_capa, aula_assistida, aula_assistindo, timestamp, total_timestamp], async function (err: Error, result: typeof ResultQueryInsertWacting[]) {
         if (err) throw err;
         res.status(200).json(result);
       })

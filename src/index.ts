@@ -8,9 +8,9 @@ const cors = require('cors');
 
 const port = 3010;
 
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
-
 app.use(routes);
+
 
 app.listen(port, () => console.log('online'));

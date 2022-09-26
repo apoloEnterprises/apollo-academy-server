@@ -3,8 +3,12 @@ USE `apollo`;
 
 CREATE TABLE IF NOT EXISTS `curso` (
    `id` varchar(255) UNIQUE NOT NULL,
-  `nome` varchar(20) NOT NULL,
+  `nome` varchar(120) NOT NULL,
   `descricao` varchar(255) NOT NULL,
+  `categoria` varchar(255) NOT NULL,
+  `subcategoria1` varchar(255),
+  `subcategoria2` varchar(255),
+  `subcategoria3` varchar(255),
   `modulos` varchar(100) NOT NULL,
   `aula` varchar(100) NOT NULL,
   `autor` varchar(100) NOT NULL,
@@ -16,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `usuario_curso` (
   `id` int(255) NOT NULL AUTO_INCREMENT,
   `id_usuario` varchar(255) UNIQUE NOT NULL,
   `id_curso` varchar(255) UNIQUE NOT NULL,
+  `foto_capa` varchar(255) UNIQUE NOT NULL,
   `aula_assistida` varchar(100) NOT NULL,
   `aula_assistindo` varchar(100) NOT NULL,
   `timestamp` varchar(100) NOT NULL,
