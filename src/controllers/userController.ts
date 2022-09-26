@@ -4,6 +4,7 @@ const userRepository = require('../repository/userRepository');
 const { v4: uuidv4 } = require('uuid');
 
 // user first actions - login, sign up, first choice of cateogries etc..
+
 class userController {
  public async index (req: Request, res: Response) {
     const {

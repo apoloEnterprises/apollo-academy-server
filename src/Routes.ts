@@ -4,6 +4,7 @@ const router = Router();
 const userController = require('./controllers/userController');
 const communityController = require('./controllers/communityController');
 const rankingsController = require('./controllers/rankingsController')
+const coursesController = require('./controllers/coursesController')
 
 // --------------------sign up routes-------------------------
 router.put('/sign-up/category', userController.index);
@@ -29,6 +30,12 @@ router.post('/community/post-answer', communityController.getPostAndAnswers);
 // --------------------ranking and level routes-------------------------
 router.post('/level-up', rankingsController.userLevelUp);
 router.post('/level/insert-exp', rankingsController.insertXP);
+// --------------------**********------------------------
+
+// --------------------courses-------------------------
+router.post('/watching', coursesController.verifyWatched);
+router.post('/insert-course', coursesController.insertCourse);
+router.post('/insert-watcing', coursesController.insertWatching);
 // --------------------**********------------------------
 
 module.exports = router;

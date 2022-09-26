@@ -2,6 +2,13 @@ import { Request, Response } from 'express';
 const db = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 // all community posts, comments, reactions, lists etc..
+const sqlType = require('./types/sqlTyped');
+const {
+  ResultQueyUser,ResultQueyPost} = require('./types/resultTyped');
+const { 
+  ResultQueyCateogry,
+  ResultQueyResposta, 
+  ResultQueyComment } = require('./types/shortResultTyped');
 
 class communityController {
  public async postIndex(req: Request, res: Response) {
@@ -20,24 +27,12 @@ class communityController {
       }
 
       const id = uuidv4();
-      interface ResultQuey {
-        id: string,
-        autor_ID: string,
-        pergunta_Txt: string,
-        pergunta_Descr: string,
-        categoria: number,
-        subCategoria1: number,
-        subCategoria2: number,
-        subCategoria3: number
-      }
-      
-      type sqlType = string;
 
-      const sql: sqlType = `INSERT INTO perguntas 
+      const sql: typeof sqlType = `INSERT INTO perguntas 
       (id, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?, ?, ?, ?)
       `;
 
-        db.query(sql, [id, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1, subCategoria2, subCategoria3], async function (err: Error, result: ResultQuey[]) {
+        db.query(sql, [id, pergunta_Txt, autor_ID, pergunta_Descr, categoria, subCategoria1, subCategoria2, subCategoria3], async function (err: Error, result: typeof ResultQueyUser[]) {
           if (err) throw err;
           res.status(200).send(JSON.stringify(result[0]))
         })
@@ -50,22 +45,11 @@ class communityController {
 
     type sqlType = string;
 
-    interface ResultQuey {
-      id: string,
-      autor_ID: string,
-      pergunta_Txt: string,
-      pergunta_Descr: string,
-      categoria: number,
-      subCategoria1: number,
-      subCategoria2: number,
-      subCategoria3: number
-    }
-
     const sql: sqlType = `
     SELECT pergunta_Txt, pergunta_Descr, categoria FROM perguntas WHERE autor_ID=?
     `;
 
-      db.query(sql, [id], async function (err: Error, result: ResultQuey[]) {
+      db.query(sql, [id], async function (err: Error, result: typeof ResultQueyPost[]) {
         if (err) throw err;
         res.status(200).send(JSON.stringify(result))
       })
@@ -76,13 +60,7 @@ class communityController {
       categoria
     } = await req.body;
 
-    type sqlType = string;
-
-    interface ResultQuey {
-      categoria: string,
-    }
-
-    const sql: sqlType = `
+    const sql: typeof sqlType = `
     SELECT *
     FROM perguntas
     WHERE categoria=?
@@ -90,7 +68,7 @@ class communityController {
 
     if (categoria) {
       db.query(sql, [categoria], 
-        async function (err: Error, result: ResultQuey[]) {
+        async function (err: Error, result: typeof ResultQueyCateogry[]) {
           if (err) throw err;
           res.status(200).send(JSON.stringify(result))
         })
@@ -106,10 +84,6 @@ class communityController {
 
     type sqlType = string;
 
-    interface ResultQuey {
-      categoria: string,
-    }
-
     const sql: sqlType = `
     SELECT pergunta_Txt, pergunta_Descr, categoria, subCategoria1, subCategoria2
     FROM perguntas
@@ -118,7 +92,7 @@ class communityController {
 
     if (categoria) {
       db.query(sql, [categoria], 
-        async function (err: Error, result: ResultQuey[]) {
+        async function (err: Error, result: typeof ResultQueyCateogry[]) {
           if (err) throw err;
           const postCount = result.length;
           res.status(200).json({
@@ -136,19 +110,13 @@ class communityController {
       
     } = await req.body;
 
-    type sqlType = string;
-
-    interface ResultQuey {
-      categoria: string,
-    }
-
-    const sql: sqlType = `
+    const sql: typeof sqlType = `
     SELECT *
     FROM respostas
     WHERE pergunta_ID=?
     `;
 
-    const sqlUpdate: sqlType = `UPDATE usuarios
+    const sqlUpdate: typeof sqlType = `UPDATE usuarios
     SET 
         categoria=?,
         subCategoria1=?,
@@ -160,7 +128,7 @@ class communityController {
 
     if (id) {
       db.query(sql, [id], 
-        async function (err: Error, result: ResultQuey[]) {
+        async function (err: Error, result: typeof ResultQueyCateogry[]) {
           if (err) throw err;
           const postCount = result.length;
           res.status(200).json({
@@ -184,40 +152,32 @@ class communityController {
       }
 
       const id = uuidv4();
-      interface ResultQuey {
-        id: string,
-        autor_ID: string,
-        pergunta_ID: string,
-        resposta_Txt: string,
-      }
-      
-      type sqlType = string;
 
-      const sql: sqlType = `INSERT INTO respostas 
+      const sql: typeof sqlType = `INSERT INTO respostas 
       (id, pergunta_ID, autor_ID, resposta_Txt) VALUES (?,?,?, ?)
       `;
 
-      const sqlGetNumberAnswers: sqlType = `
+      const sqlGetNumberAnswers: typeof sqlType = `
       SELECT *
       FROM respostas
       WHERE pergunta_ID=?`;
 
-      const sqlUpdate: sqlType = `UPDATE perguntas
+      const sqlUpdate: typeof sqlType = `UPDATE perguntas
       SET 
         qnt_respostas
       WHERE 
         id=?`;
 
-        db.query(sql, [id, pergunta_ID, autor_ID, resposta_Txt], function (err: Error, result: ResultQuey[]) {
+        db.query(sql, [id, pergunta_ID, autor_ID, resposta_Txt], function (err: Error, result: typeof ResultQueyResposta[]) {
           if (err) throw err;
           const queryResult = result[0];
           db.query(sqlGetNumberAnswers, [pergunta_ID], 
-            async function (err: Error, result: ResultQuey[]) {
+            async function (err: Error, result: typeof ResultQueyResposta[]) {
               if (err) throw err;
               const postCount = result.length;
               const numero_respostas = `${postCount}`;
               db.query(sqlUpdate, [pergunta_ID, numero_respostas], 
-                async function (err: Error, result: ResultQuey[]) {
+                async function (err: Error, result: typeof ResultQueyResposta[]) {
                  if (err) throw err;
                   res.status(200).send(queryResult)
                 });
@@ -231,16 +191,6 @@ class communityController {
         } = await req.body;
     
         type sqlType = string;
-        interface ResultQuey {
-          id: string,
-          autor_ID: string,
-          pergunta_Txt: string,
-          pergunta_Descr: string,
-          categoria: number,
-          subCategoria1: number,
-          subCategoria2: number,
-          subCategoria3: number
-        }
 
         interface ResultQueyAnswer {
           autor_ID: string,
@@ -265,13 +215,13 @@ class communityController {
 
         if (id) {
           db.query(sql, [id], 
-             async function (err: Error, result: ResultQuey[]) {
+             async function (err: Error, result: typeof ResultQueyPost[]) {
               if (err) throw err;
               const postResult = result
-                db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+                db.query(sqlAnswer, [id], function (err: Error, result: typeof ResultQueyResposta[]) {
                   if (err) throw err;
                   const postAnswer = result
-                    db.query(sqlAnswer, [id], function (err: Error, result: ResultQueyAnswer[]) {
+                    db.query(sqlAnswer, [id], function (err: Error, result: typeof ResultQueyResposta[]) {
                       if (err) throw err;
                       const answerComment = result
                       res.status(200).json({
@@ -298,18 +248,11 @@ class communityController {
         }
   
         const id = uuidv4();
-        interface ResultQuey {
-          autor_ID: string,
-          resposta_ID: string,
-          comentario_Txt: string,
-        }
 
-        type sqlType = string;
-
-        const sql: sqlType = `INSERT INTO comentarios 
+        const sql: typeof sqlType = `INSERT INTO comentarios 
         (id, resposta_ID, autor_ID, comentario_Txt) VALUES (?,?,?, ?)`
 
-        db.query(sql, [id, resposta_ID, autor_ID, comentario_Txt], function (err: Error, result: ResultQuey[]) {
+        db.query(sql, [id, resposta_ID, autor_ID, comentario_Txt], function (err: Error, result: typeof ResultQueyComment[]) {
           if (err) throw err;
           res.status(200).json({
             comentario: JSON.stringify(result)
