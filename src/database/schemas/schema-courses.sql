@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS `curso` (
 
 CREATE TABLE IF NOT EXISTS `usuario_curso` (
   `id` int(255) NOT NULL AUTO_INCREMENT,
-  `id_usuario` varchar(255) UNIQUE NOT NULL,
-  `id_curso` varchar(255) UNIQUE NOT NULL,
+  `id_usuario` varchar(255),
+  `id_curso` varchar(255),
   `foto_capa` varchar(255) UNIQUE NOT NULL,
   `aula_assistida` varchar(100) NOT NULL,
   `aula_assistindo` varchar(100) NOT NULL,

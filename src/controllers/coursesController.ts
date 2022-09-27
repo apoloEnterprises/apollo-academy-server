@@ -25,6 +25,13 @@ class coursesController {
       FROM usuario_curso
       WHERE id_usuario=?
       `
+
+      const sqlWatched2: typeof sqlType = `
+      SELECT *
+      FROM usuario_curso
+      LEFT JOIN curso
+      ON usuario_curso.id_curso = curso.id
+      `
       
       db.query(sqlWatched, [id_usuario], async function (err: Error, result: typeof ResultQueryWatched[]) {
         if (err) throw err;
@@ -35,13 +42,13 @@ class coursesController {
             watching: false
           });
         } else {
-          db.query('SELECT * FROM curso WHERE id=?', [id_curso], async function (err: Error, result: typeof ResultQueryWatched[]) {
+          db.query(sqlWatched2, [id_usuario], function (err: Error, result: typeof ResultQueryWatched[]) {
           res.status(200).json({
             watching: true,
-            usuario_curso: result_user_course,
             curso: result
           })
-          }) 
+          console.log(result);
+          })
         }
       })
 }
@@ -57,7 +64,8 @@ public async insertCourse(req: Request, res: Response) {
       modulos,
       aula,
       autor,
-      alunos
+      alunos,
+      categoria
       } = await req.body;
 
       const id = uuidv4();
@@ -70,11 +78,11 @@ public async insertCourse(req: Request, res: Response) {
 
       const sqlWatched: typeof sqlType = `
       INSERT INTO curso
-      (id, nome, descricao, modulos, aula, autor, alunos)
-      VALUES (?,?,?,?,?,?, ?) 
+      (id, nome, descricao, modulos, aula, autor, alunos, categoria)
+      VALUES (?,?,?,?,?,?, ?, ?) 
       `
-      
-      db.query(sqlWatched, [id, nome, descricao, modulos, aula, autor, alunos], async function (err: Error, result: typeof ResultQueryWatched[]) {
+  
+      db.query(sqlWatched, [id, nome, descricao, modulos, aula, autor, alunos, categoria], async function (err: Error, result: typeof ResultQueryWatched[]) {
         if (err) throw err;
         res.status(200).json(result);
       })
@@ -106,6 +114,7 @@ public async insertWatching(req: Request, res: Response) {
       (id_usuario, id_curso, foto_capa, aula_assistida, aula_assistindo, timestamp, total_timestamp)
       VALUES (?,?,?,?,?, ?, ?) 
       `
+
       
       db.query(sqlWatched, [id_usuario, id_curso, foto_capa, aula_assistida, aula_assistindo, timestamp, total_timestamp], async function (err: Error, result: typeof ResultQueryInsertWacting[]) {
         if (err) throw err;
