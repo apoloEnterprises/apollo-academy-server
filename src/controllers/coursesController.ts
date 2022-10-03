@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 const db = require('../database/db');
 const sqlType = require('./types/sqlTyped');
-const { ResultQueryWatched, ResultQueryInsertWacting } = require('./types/shortResultTyped');
+const { ResultQueryWatched, ResultQueryInsertWacting, ResultQueryInsertCategory } = require('./types/shortResultTyped');
 const { v4: uuidv4 } = require('uuid');
 
 class coursesController {
@@ -47,10 +47,9 @@ class coursesController {
             watching: true,
             curso: result
           })
-          console.log(result);
           })
         }
-      })
+      });
 }
 
 public async insertCourse(req: Request, res: Response) {
@@ -62,10 +61,12 @@ public async insertCourse(req: Request, res: Response) {
       nome,
       descricao,
       modulos,
+      foto_capa,
       aula,
       autor,
       alunos,
-      categoria
+      categoria, 
+      subcategoria1
       } = await req.body;
 
       const id = uuidv4();
@@ -78,11 +79,11 @@ public async insertCourse(req: Request, res: Response) {
 
       const sqlWatched: typeof sqlType = `
       INSERT INTO curso
-      (id, nome, descricao, modulos, aula, autor, alunos, categoria)
-      VALUES (?,?,?,?,?,?, ?, ?) 
-      `
+      (id, nome, descricao, modulos, aula, autor, alunos, categoria, foto_capa, subcategoria1)
+      VALUES (?,?,?,?,?,?, ?, ?, ?, ?) 
+      ` 
   
-      db.query(sqlWatched, [id, nome, descricao, modulos, aula, autor, alunos, categoria], async function (err: Error, result: typeof ResultQueryWatched[]) {
+      db.query(sqlWatched, [id, nome, descricao, modulos, aula, autor, alunos, categoria, foto_capa, subcategoria1], async function (err: Error, result: typeof ResultQueryWatched[]) {
         if (err) throw err;
         res.status(200).json(result);
       })
@@ -92,11 +93,10 @@ public async insertWatching(req: Request, res: Response) {
 
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
+ 
     const {
       id_usuario,
       id_curso,
-      foto_capa,
       aula_assistida,
       aula_assistindo,
       timestamp,
@@ -108,19 +108,64 @@ public async insertWatching(req: Request, res: Response) {
           message: 'Error: No ID provided.'
         })
       }
-
+ 
       const sqlWatched: typeof sqlType = `
       INSERT INTO usuario_curso
-      (id_usuario, id_curso, foto_capa, aula_assistida, aula_assistindo, timestamp, total_timestamp)
-      VALUES (?,?,?,?,?, ?, ?) 
+      (id_usuario, id_curso, aula_assistida, aula_assistindo, timestamp, total_timestamp)
+      VALUES (?,?,?,?,?, ?) 
       `
-
       
-      db.query(sqlWatched, [id_usuario, id_curso, foto_capa, aula_assistida, aula_assistindo, timestamp, total_timestamp], async function (err: Error, result: typeof ResultQueryInsertWacting[]) {
+      db.query(sqlWatched, [id_usuario, id_curso, aula_assistida, aula_assistindo, timestamp, total_timestamp], async function (err: Error, result: typeof ResultQueryInsertWacting[]) {
         if (err) throw err;
         res.status(200).json(result);
       })
 }
+
+    public async insertCourseCategory(req: Request, res: Response) {
+      const {
+        categoria,
+        sub_categoria,
+        item
+      } = req.body;
+
+
+      if (!categoria || !sub_categoria) {
+        res.status(404).send('Categories not found.');
+      }
+
+      const sql: typeof sqlType = `
+      INSERT INTO curso_category (categoria, sub_categoria, item)
+      VALUES (?, ?, ?)
+      ` 
+
+      db.query(sql, [categoria, sub_categoria, item], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+        if (err) throw err;
+        res.send(result)
+      })
+     }
+
+     public async sendCourseCategory(req: Request, res: Response) {
+      const {
+        sub_categoria
+      } = req.params
+      
+      if (!sub_categoria) {
+        res.status(404).send('Category not found.')
+      }
+
+      const sql: typeof sqlType = `
+      SELECT sub_categoria
+      FROM curso_category
+      WHERE sub_categoria=?
+      `
+
+      db.query(sql, [sub_categoria], async function (err: Error, result: any) {
+        if(err) throw err;
+        res.send(result)
+      })
+
+     }
+
 }
 
 module.exports = new coursesController();

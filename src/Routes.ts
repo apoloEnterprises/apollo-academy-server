@@ -10,7 +10,9 @@ const coursesController = require('./controllers/coursesController')
 router.put('/sign-up/category', userController.index);
 router.post('/sign-up', userController.select);
 router.post('/sign-in', userController.getIn);
+router.post('/feed', userController.handleFeed);
 // --------------------**********------------------------
+
 
 // --------------------community routes-------------------------
 router.post('/community/create-post', communityController.postIndex);
@@ -36,6 +38,7 @@ router.post('/level/insert-exp', rankingsController.insertXP);
 router.post('/watching', coursesController.verifyWatched);
 router.post('/insert-course', coursesController.insertCourse);
 router.post('/insert-watcing', coursesController.insertWatching);
+router.post('/insert-category', coursesController.insertCourseCategory);
 // --------------------**********------------------------
 
 

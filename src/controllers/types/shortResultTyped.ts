@@ -28,3 +28,8 @@ export default interface ResultQueryInsertWacting {
   aula_assistindo: string,
   timestamp: string,
 }
+
+export default interface ResultQueryInsertCategory {
+  category: string,
+  sub_category: string,
+}
