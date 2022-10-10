@@ -62,24 +62,9 @@ class userController {
       nomeDeUsuario: string,
       senha: string,
       email: string,
-      trofeus: number,
-      categoria: number,
-      subCategoria1: number,
-      subCategoria2: number,
-      subCategoria3: number
     }
 
     const id = uuidv4();
-
-    interface NumData {
-      trofeus: number,
-      categoria: number,
-      subCategoria1: number,
-      subCategoria2: number,
-      subCategoria3: number
-    }
-
-    const otherData: NumData = {trofeus: 0, categoria: 0, subCategoria1: 0, subCategoria2: 0, subCategoria3: 0};
 
     if (!nomeDeUsuario) {
       res.status(404).send('No user provided.')
@@ -96,7 +81,7 @@ class userController {
         res.status(401).send('Email already in use.');
       } else {
         db.query(`INSERT INTO usuarios
-        (id, nomeDeUsuario, email, senha, trofeus, categoria, subCategoria1,subCategoria2,subCategoria3) VALUES (?,?,?,?,?,?, ?,?,?)`, [id, nomeDeUsuario, email, senha, otherData.trofeus, otherData.categoria, otherData.subCategoria1, otherData.subCategoria2, otherData.subCategoria3], async function (err: Error, result: ResultQuey[]) {
+        (id, nomeDeUsuario, email, senha) VALUES (?,?,?,?)`, [id, nomeDeUsuario, email, senha], async function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
           res.status(200).send(`User created successfully: ${nomeDeUsuario}`)      
         })}
@@ -129,13 +114,13 @@ class userController {
 
     db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
       if(err) throw err;
-      const ResultUsername = result[0].nomeDeUsuario;
-      const ResultPassword = result[0].senha;
+      const ResultUsername = result[0]?.nomeDeUsuario;
+      const ResultPassword = result[0]?.senha;
 
       if(nomeDeUsuario === ResultUsername && senha === ResultPassword) {
         res.status(200).send({
           status: `logged in successfully as ${nomeDeUsuario}`
-        })
+        }) 
       } else {
         res.status(404).send({
           status: 'Username or password is not valid.'
@@ -159,9 +144,9 @@ class userController {
           message: 'User not found.',
         })
       }
-
+ 
       const sql: typeof sqlType = `
-      SELECT subCategoria1, subCategoria2, subCategoria3, nomeDeUsuario, categoria
+      SELECT nomeDeUsuario
       FROM usuarios
       WHERE id=?
       `

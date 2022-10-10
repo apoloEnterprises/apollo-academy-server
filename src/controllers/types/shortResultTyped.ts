@@ -33,3 +33,20 @@ export default interface ResultQueryInsertCategory {
   category: string,
   sub_category: string,
 }
+
+
+export default interface ResultQueryInsertCourse {
+	nome: string,
+	descricao:string,
+	foto_capa: string,
+	autor: string,
+	categoria:string,
+	sub_categoria:string,
+	item:string
+}
+
+export default interface ResultQueryCourseModules {
+	nome_modulo: string,
+	aula_nome:string,
+	video: string,
+}

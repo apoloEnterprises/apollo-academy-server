@@ -37,8 +37,14 @@ router.post('/level/insert-exp', rankingsController.insertXP);
 // --------------------courses-------------------------
 router.post('/watching', coursesController.verifyWatched);
 router.post('/insert-course', coursesController.insertCourse);
+router.post('/get-course-category', coursesController.getCourseAndCategory);
 router.post('/insert-watcing', coursesController.insertWatching);
 router.post('/insert-category', coursesController.insertCourseCategory);
+router.post('/insert-aula', coursesController.insertAula);
+router.post('/insert-modulo', coursesController.insertModolo); 
+router.post('/get-modules', coursesController.getModules); 
+router.post('/get-aulas', coursesController.getAulas);  
+// router.post('/aula-1', coursesController.hostCourse);
 // --------------------**********------------------------
 
 
