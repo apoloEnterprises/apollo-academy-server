@@ -132,11 +132,6 @@ class userController {
    public async handleFeed(req: Request, res: Response) {
     const {
       id,
-      subCategoria1,
-      subCategoria2,
-      subCategoria3,
-      nomeDeUsuario,
-      
       } = await req.body;
           
       if(!id) {
@@ -145,99 +140,71 @@ class userController {
         })
       }
  
-      const sql: typeof sqlType = `
-      SELECT nomeDeUsuario
-      FROM usuarios
-      WHERE id=?
+
+      const sqlUser: typeof sqlType = `
+      SELECT *
+      FROM usuario_category
+      RIGHT JOIN usuarios
+      ON usuario_category.id_usuario = usuarios.id
       `
-      
-      // function handleCategory() {
-      // } 
-      
-      // const mapped = (categoria: string) => {
-        
-      // }
-
-      // console.log(handleCategory());
-
-      // const sqlMatchCategories: typeof sqlType = `
-      // SELECT *
-      // FROM curso_category
-      // RIGHT JOIN usuarios
-      // ON curso_category.sub_categoria = usuarios.subCategoria1
-      // `
 
       const sqlMatchCategories: typeof sqlType = `
       SELECT item
       FROM curso_category
-      WHERE sub_categoria IN (?, ?)
+      WHERE sub_categoria IN (?, ?, ?, ?)
       `
   
-      db.query(sql, [id], async function (err: Error, result: typeof ResultQueyUser[]) {
+      db.query(sqlUser, [id], async function (err: Error, result: typeof ResultQueyUser[]) {
         if (err) throw err;
         const [re] = await result;
         const categoryUser = re?.categoria;
-        const subCategory_1_User = re?.subCategoria1;
-        const subCcategory_2_User = re?.subCategoria2;
-        const SubCategory_3_User = re?.subCategoria3;
+        const subCategory_1_User = re?.sub_categoria;
+        const subCategory_2_User = re?.sub_categoria2;
+        const SubCategory_3_User = re?.sub_categoria3;
         
-
-        db.query(sqlMatchCategories, [subCategory_1_User, SubCategory_3_User], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+        db.query(sqlMatchCategories, [categoryUser, subCategory_1_User, subCategory_2_User, SubCategory_3_User], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
           res.status(200).send(result)
          } )
-
-      //   function findMe() {
-
-      //     const steps = categorias; // (1)
-      
-      //     return Object.values(steps).filter((obj: any) => obj.programacao === subCcategory_2_User)[0];
-      // }
-
-        // switch (categoryUser) {
-        //   case 'programacao':
-        //     res.send(findMe())
-        //     // res.json(categorias[0].programacao.front_End);
-        //     categorias.map((category: any) => {
-        //       if (category[0] == categoryUser) {
-        //         console.log('foi');
-        //       } else {
-        //         console.log('n foi');
-        //         console.log(categoryUser);
-        //         console.log('-----------');
-        //         console.log(Object.keys(category[0]));
-        //       }
-        //     })
-        //     break;
-        // }
-
-        // if (categoryUser == 9) {
-        //   res.status(200).send('foi');
-        // } else {
-        //   res.status(200).send('nao foi');
-        // }
-
-        // switch (categoryUser) {
-        //     case :
-            
-        //     break;
-        
-        //   default:
-        //     break;
-        // }
-
-        // categorias.map((category: any) => {
-        //   if (category[0] == categoryUser) {
-        //     res.status(200).send('foi');
-        //   } else {
-        //     res.status(200).send('nao foi');
-        //     console.log(categoryUser);
-        //     console.log('-----------');
-        //     console.log(category);
-        //   }
-        // })
-
-        // res.status(200).json(categoryUser)
       })
+
+   }
+
+   public async inserUserCategory(req: Request, res: Response) {
+    const {
+      id_usuario,
+      categoria,
+      sub_categoria,
+      sub_categoria2,
+      sub_categoria3,
+    } = req.body
+
+    if (!id_usuario && !categoria && !sub_categoria && !sub_categoria2 && !sub_categoria3) {
+      res.status(404).send('No data found.')
+    }
+
+    // const sqlUser: typeof sqlType = `
+    // SELECT *
+    // FROM usuarios
+    // RIGHT JOIN usuario_category
+    // ON usuarios.id = usuario_category.id_usuario
+    // `
+
+    // const sqlMatchCategories: typeof sqlType = `
+    // SELECT item
+    // FROM curso_category
+    // WHERE sub_categoria IN (?, ?)
+    // `
+
+    const sqlInsertCategories: typeof sqlType = `
+    INSERT INTO usuario_category (id_usuario, categoria, sub_categoria, sub_categoria2, sub_categoria3)
+    VALUES (?,?,?,?,?)
+    `
+
+    db.query(sqlInsertCategories, [id_usuario, categoria, sub_categoria, sub_categoria2, sub_categoria3], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      res.status(200).send(result)
+     })
+
    }
 }
 

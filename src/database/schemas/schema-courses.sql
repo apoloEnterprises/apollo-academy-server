@@ -2,11 +2,13 @@ CREATE DATABASE IF NOT EXISTS `apollo` DEFAULT CHARACTER SET utf8 COLLATE utf8_g
 USE `apollo`;
 
 CREATE TABLE IF NOT EXISTS `curso` (
-   `id` varchar(255) UNIQUE NOT NULL,
+  `id` varchar(255) UNIQUE NOT NULL,
+  `data` TIMESTAMP DEFAULT NOW(),
   `nome` varchar(120) NOT NULL,
   `descricao` varchar(255) NOT NULL,
   `foto_capa` varchar(255) NOT NULL,
   `autor` varchar(100) NOT NULL,
+  `idioma` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
@@ -51,7 +53,8 @@ CREATE TABLE IF NOT EXISTS `curso_aulas` (
    `id_curso` varchar(255),
    `id_modulo` varchar(255),
    `aula_nome` varchar(255) UNIQUE NOT NULL,
-   `video` varchar(255),
+   `video` varchar(255) NOT NULL,
+   `duracao_total` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE,
   FOREIGN KEY (`id_modulo`) REFERENCES curso_modulos(id) ON UPDATE CASCADE
@@ -62,6 +65,27 @@ CREATE TABLE IF NOT EXISTS `curso_modulos` (
    `id_curso` varchar(255),
    `nome_modulo` varchar(255) UNIQUE NOT NULL,
    `modulo_ordem` varchar(255) UNIQUE NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- //////////////////////////////////////////////////////////////////
+
+CREATE TABLE IF NOT EXISTS `curso_avaliacoes` (
+   `id` varchar(255) UNIQUE NOT NULL,
+   `id_curso` varchar(255) NOT NULL,
+   `id_aluno` varchar(255) NOT NULL,
+   `nota` DECIMAL(6,4) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE,
+  FOREIGN KEY (`id_aluno`) REFERENCES usuarios(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `curso_alunos` (
+   `id` varchar(255) UNIQUE NOT NULL,
+   `data` TIMESTAMP DEFAULT NOW(),
+   `id_curso` varchar(255),
+   `id_aluno` varchar(255) UNIQUE NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
