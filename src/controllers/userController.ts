@@ -151,9 +151,9 @@ class userController {
       const sqlMatchCategories: typeof sqlType = `
       SELECT item
       FROM curso_category
-      WHERE sub_categoria IN (?, ?, ?, ?)
+      WHERE sub_categoria IN (?, ?, ?)
       `
-  
+   
       db.query(sqlUser, [id], async function (err: Error, result: typeof ResultQueyUser[]) {
         if (err) throw err;
         const [re] = await result;
@@ -162,7 +162,7 @@ class userController {
         const subCategory_2_User = re?.sub_categoria2;
         const SubCategory_3_User = re?.sub_categoria3;
         
-        db.query(sqlMatchCategories, [categoryUser, subCategory_1_User, subCategory_2_User, SubCategory_3_User], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+        db.query(sqlMatchCategories, [subCategory_1_User, subCategory_2_User, SubCategory_3_User], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
           res.status(200).send(result)
          } )
       })
@@ -196,8 +196,7 @@ class userController {
     // `
 
     const sqlInsertCategories: typeof sqlType = `
-    INSERT INTO usuario_category (id_usuario, categoria, sub_categoria, sub_categoria2, sub_categoria3)
-    VALUES (?,?,?,?,?)
+    SELECT curso
     `
 
     db.query(sqlInsertCategories, [id_usuario, categoria, sub_categoria, sub_categoria2, sub_categoria3], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {

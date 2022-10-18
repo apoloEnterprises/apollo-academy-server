@@ -48,6 +48,7 @@ router.post('/send-rating', coursesController.sendRating);
 router.post('/inscrever-curso-aluno', coursesController.inscreverCursoAluno);  
 router.get('/get-media-nota/:id_curso', coursesController.getMediaNota);  
 router.get('/get-alunos/:id_aluno', coursesController.getNumAlunos);  
+router.get('/get-courses-feed', coursesController.returnCursoFeed);  
 // router.post('/aula-1', coursesController.hostCourse);
 // --------------------**********------------------------
 

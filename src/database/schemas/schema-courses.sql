@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS `curso` (
   `id` varchar(255) UNIQUE NOT NULL,
   `data` TIMESTAMP DEFAULT NOW(),
   `nome` varchar(120) NOT NULL,
-  `descricao` varchar(255) NOT NULL,
+  `descricao` varchar(255),
   `foto_capa` varchar(255) NOT NULL,
-  `autor` varchar(100) NOT NULL,
-  `idioma` varchar(100) NOT NULL,
+  `autor` varchar(100),
+  `idioma` varchar(100),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 

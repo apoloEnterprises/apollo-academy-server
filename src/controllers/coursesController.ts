@@ -4,7 +4,8 @@ const sqlType = require('./types/sqlTyped');
 const { ResultQueryWatched, ResultQueryInsertWacting, ResultQueryInsertCategory,
   ResultQueryInsertCourse, ResultQueryCourseModules } = require('./types/shortResultTyped');
 const { v4: uuidv4 } = require('uuid');
-
+const {
+  ResultQueyUser,ResultQueyPost} = require('./types/resultTyped');
 class coursesController {
  public async verifyWatched(req: Request, res: Response) {
 
@@ -89,7 +90,7 @@ public async insertCourse(req: Request, res: Response) {
       VALUES (?,?,?,?) 
       ` 
    
-      db.query(sqlWatched, [id, nome, descricao, autor, foto_capa], async function (err: Error, result: typeof ResultQueryInsertCourse[]) {
+      db.query(sqlWatched, [id, nome, descricao, foto_capa, autor], async function (err: Error, result: typeof ResultQueryInsertCourse[]) {
         if (err) throw err;
         const [course] = result
         console.log(course);
@@ -439,6 +440,55 @@ public async insertWatching(req: Request, res: Response) {
       })
 
 
+     }
+
+     public async returnCursoFeed(req: Request, res: Response) {
+      
+      const {
+        id 
+      } = req.body;
+      
+      const sqlSelect: typeof sqlType = `
+      SELECT curso.nome, curso.foto_capa, curso_category.categoria, curso_category.item, curso_category.sub_categoria
+      FROM curso
+      LEFT JOIN curso_category on
+      curso.id = curso_category.id_curso 
+      AND curso_category.sub_categoria=?
+      `
+
+      const sqlUser: typeof sqlType = `
+      SELECT *
+      FROM usuario_category
+      RIGHT JOIN usuarios
+      ON usuario_category.id_usuario = usuarios.id
+      `
+
+      const sqlMatchCategories: typeof sqlType = `
+      SELECT item
+      FROM curso_category
+      WHERE sub_categoria IN (?, ?, ?)
+      `
+
+
+
+      
+      db.query(sqlUser, [id], async function (err: Error, result: typeof ResultQueyUser[]) {
+        if (err) throw err;
+        const [re] = await result;
+        const categoryUser = re?.categoria;
+        const subCategory_1_User = re?.sub_categoria;
+        const subCategory_2_User = re?.sub_categoria2;
+        const SubCategory_3_User = re?.sub_categoria3;
+        db.query(sqlMatchCategories, [subCategory_1_User, subCategory_2_User, SubCategory_3_User], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+          db.query(sqlSelect, [subCategory_1_User], async function (err: Error, result: any) {
+            if (err) throw err;
+            res.status(200).json({
+              re: result
+            }) 
+          })
+         } )
+      })
+      
      }
 }
 
