@@ -447,14 +447,14 @@ public async insertWatching(req: Request, res: Response) {
       const {
         id 
       } = req.body;
-      
+       
       const sqlSelect: typeof sqlType = `
       SELECT curso.nome, curso.foto_capa, curso_category.categoria, curso_category.item, curso_category.sub_categoria
       FROM curso
       LEFT JOIN curso_category on
       curso.id = curso_category.id_curso 
       AND curso_category.sub_categoria=?
-      `
+      ` 
 
       const sqlUser: typeof sqlType = `
       SELECT *
@@ -469,9 +469,7 @@ public async insertWatching(req: Request, res: Response) {
       WHERE sub_categoria IN (?, ?, ?)
       `
 
-
-
-      
+         
       db.query(sqlUser, [id], async function (err: Error, result: typeof ResultQueyUser[]) {
         if (err) throw err;
         const [re] = await result;

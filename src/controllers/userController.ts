@@ -8,9 +8,9 @@ const sqlType = require('./types/sqlTyped');
 const {
   ResultQueyUser,ResultQueyPost} = require('./types/resultTyped');
 const {  ResultQueryInsertCategory } = require('./types/shortResultTyped');
-
+ 
 // user first actions - login, sign up, first choice of cateogries etc..
-
+ 
 class userController {
  public async index (req: Request, res: Response) {
     const {
@@ -62,9 +62,11 @@ class userController {
       nomeDeUsuario: string,
       senha: string,
       email: string,
-    }
-
+    }  
+    
     const id = uuidv4();
+
+    const password = uuidv4(senha)
 
     if (!nomeDeUsuario) {
       res.status(404).send('No user provided.')
@@ -81,7 +83,7 @@ class userController {
         res.status(401).send('Email already in use.');
       } else {
         db.query(`INSERT INTO usuarios
-        (id, nomeDeUsuario, email, senha) VALUES (?,?,?,?)`, [id, nomeDeUsuario, email, senha], async function (err: Error, result: ResultQuey[]) {
+        (id, nomeDeUsuario, email, senha) VALUES (?,?,?,?)`, [id, nomeDeUsuario, email, password], async function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
           res.status(200).send(`User created successfully: ${nomeDeUsuario}`)      
         })}

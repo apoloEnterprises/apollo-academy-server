@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `curso_aulas` (
    `id_modulo` varchar(255),
    `aula_nome` varchar(255) UNIQUE NOT NULL,
    `video` varchar(255) NOT NULL,
-   `duracao_total` varchar(255) NOT NULL,
+   `duracao_total` varchar(255),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE,
   FOREIGN KEY (`id_modulo`) REFERENCES curso_modulos(id) ON UPDATE CASCADE
