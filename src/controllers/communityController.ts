@@ -276,6 +276,33 @@ class communityController {
         })
       }
 
+      public async postCommentToQuestion(req: Request, res: Response) {
+        const {
+          pergunta_ID,
+          autor_name,
+          comentario_Txt
+        } = req.body;
+ 
+        if (!autor_name) {
+          res.status(404).send('No user id provided.')
+        }
+  
+        const id = uuidv4();
+
+        const data = nowDate;
+
+  
+        const sql: typeof sqlType = `INSERT INTO comentario_pergunta 
+        (id, pergunta_ID, data, autor_name, comentario_Txt) VALUES (?,?,?, ?, ?)`
+
+        db.query(sql, [id, pergunta_ID, data, autor_name, comentario_Txt], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          res.status(200).json({
+            comentario: JSON.stringify(result)
+          })
+        })
+      }
+
       public async likeAnswer (req: Request, res: Response) {
         const {
           resposta_id,

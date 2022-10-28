@@ -24,6 +24,17 @@ CREATE TABLE IF NOT EXISTS `respostas` (
   FOREIGN KEY (`autor_resposta_name`) REFERENCES usuarios(nomeDeUsuario) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `comentario_pergunta` (
+  `id` varchar(100) NOT NULL,
+  `data` varchar(100) NOT NULL,
+  `pergunta_ID` varchar(100) NOT NULL,
+  `autor_name` varchar(100) NOT NULL,
+  `comentario_Txt` varchar(855) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`pergunta_ID`) REFERENCES perguntas(id) ON UPDATE CASCADE,
+  FOREIGN KEY (`autor_name`) REFERENCES usuarios(nomeDeUsuario) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `respostas_likes` (
   `id` varchar(100) NOT NULL,
   `data` varchar(100) NOT NULL,

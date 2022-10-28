@@ -18,23 +18,21 @@ router.post('/insert-user-category', userController.inserUserCategory);
 router.post('/community/create-post', communityController.postIndex);
 router.get('/community/post/:id', communityController.getUserPosts);
 router.get('/community/posts/:categoria', communityController.getPostByCategory);
-
 // number of all posts in that category
 router.post('/community/post-total', communityController.getPostNumber);
-
 // number of total answers in a post
 router.get('/community/post-total-answer/:id', communityController.getPostTotalAnswersNumber);
-
 router.post('/community/post-create-answer', communityController.postAnwser);
 router.post('/community/like-comment', communityController.likeAnswer);
 router.get('/community/like-comment/:resposta_id', communityController.listLikesAnswer);
 router.post('/community/post-create-comment', communityController.postComment);
+router.post('/community/post-create-comment-answer', communityController.postCommentToQuestion);
 router.get('/community/post-answer/:id', communityController.getPostAndAnswers);
 // --------------------**********------------------------
 
-// --------------------ranking and level routes-------------------------
-router.post('/level-up', rankingsController.userLevelUp);
-router.post('/level/insert-exp', rankingsController.insertXP);
+// --------------------ranking and thrphy routes-------------------------
+// router.post('/level-up', rankingsController.userLevelUp);
+// router.post('/level/insert-exp', rankingsController.insertXP);
 // --------------------**********------------------------
 
 // --------------------courses------------------------- 

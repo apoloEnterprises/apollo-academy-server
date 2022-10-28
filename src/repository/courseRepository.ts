@@ -14,7 +14,6 @@ class courseRepository {
     console.log(result);
   });
   }
-  
-}
-
+} 
+ 
 module.exports = new courseRepository();
