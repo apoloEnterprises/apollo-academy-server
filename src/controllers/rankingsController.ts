@@ -9,7 +9,7 @@ class rankingsController {
       id
       } = await req.body; 
 
-       
+        
     }
 }
 

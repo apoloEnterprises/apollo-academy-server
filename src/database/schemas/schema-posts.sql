@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `respostas_likes` (
   `autor_like` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`resposta_id`) REFERENCES respostas(id) ON UPDATE CASCADE,
-  FOREIGN KEY (`autor_like`) REFERENCES usuarios(id) ON UPDATE CASCADE
+  FOREIGN KEY (`autor_like`) REFERENCES usuarios(nomeDeUsuario) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 
@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS `posts_likes` (
   `pergunta_ID` varchar(100) NOT NULL,
   `autor_ID` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`pergunta_ID`) REFERENCES perguntas(id) ON UPDATE CASCADE
+  FOREIGN KEY (`pergunta_ID`) REFERENCES perguntas(id) ON UPDATE CASCADE,
+  FOREIGN KEY (`autor_ID`) REFERENCES perguntas(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `comentarios_likes` (

@@ -23,7 +23,7 @@ class communityController {
  
       if (!autor_name || !categoria || !subCategoria || !pergunta_Txt) {
         res.status(404).send('Error sir')
-      }
+      } 
  
       const data = nowDate;
 
@@ -69,7 +69,7 @@ class communityController {
 
   public async getPostByCategory(req: Request, res: Response) {
     const {
-      categoria
+      categoria, subCategoria
     } = await req.params;
 
     const sql: typeof sqlType = `
@@ -78,21 +78,18 @@ class communityController {
     WHERE categoria=?
     `;
 
-    // const sqlPost: typeof sqlType = `
-    // SELECT perguntas.pergunta_Txt, perguntas.pergunta_Descr, perguntas.subCategoria1, usuarios.nomeDeUsuario 
-    // FROM perguntas
-    // LEFT JOIN usuarios
-    // ON (perguntas.autor_name = usuarios.id )
-    // AND perguntas.categoria = ?
-    // ` 
+    const sql2: typeof sqlType = `
+    SELECT *
+    FROM perguntas
+    WHERE categoria=?
+    AND subCategoria=?
+    `;
 
-    // const sqlUser: typeof sqlType = `
-    // SELECT nomeDeUsuario
-    // FROM usuarios
-    // WHERE id=?
-    // `;
+    if (!categoria && !subCategoria) {
+      res.status(404).send('Category not found.')
+    }
 
-    if (categoria) {
+    if(subCategoria === 'Selecionar filtro') {
       db.query(sql, [categoria], 
         async function (err: Error, result: typeof ResultQueyCateogry[]) {
           if (err) throw err;
@@ -101,8 +98,34 @@ class communityController {
           res.status(200).send(result)
         })
     } else {
-      res.status(404).send('Category not found.')
+      db.query(sql2, [categoria, subCategoria], 
+        async function (err: Error, result: typeof ResultQueyCateogry[]) {
+          if (err) throw err;
+          // const user = result[0].autor_name
+          // const re = result[0]
+          res.status(200).send(result)
+        })
     }
+
+
+    // if (categoria && !subCategoria) {
+    //   db.query(sql, [categoria], 
+    //     async function (err: Error, result: typeof ResultQueyCateogry[]) {
+    //       if (err) throw err;
+    //       // const user = result[0].autor_name
+    //       // const re = result[0]
+    //       res.status(200).send(result)
+    //     })
+    // } 
+    // else {
+    //   db.query(sql2, [categoria, subCategoria], 
+    //     async function (err: Error, result: typeof ResultQueyCateogry[]) {
+    //       if (err) throw err;
+    //       // const user = result[0].autor_name
+    //       // const re = result[0]
+    //       res.status(200).send(result)
+    //     })
+    // }
   }
  
   async getPostNumber (req: Request, res: Response) {
@@ -169,7 +192,7 @@ class communityController {
       } 
  
       const data = nowDate;
- 
+  
       const id = uuidv4();
   
       const sql: typeof sqlType = `INSERT INTO respostas 
@@ -259,7 +282,7 @@ class communityController {
         if (!autor_ID) {
           res.status(404).send('No user id provided.')
         }
-  
+   
         const id = uuidv4();
 
         const data = nowDate;
@@ -276,6 +299,29 @@ class communityController {
         })
       }
 
+      public async getCommentAnswer(req: Request, res: Response) {
+        const {
+          resposta_ID
+        } = req.params;
+ 
+        if (!resposta_ID) {
+          res.status(404).send('No user id provided.')
+        }
+  
+        const sql: typeof sqlType = `
+        SELECT * 
+        FROM comentarios
+        WHERE resposta_ID=? 
+        `
+
+        db.query(sql, [resposta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          res.status(200).send(result)
+        })
+      }
+
+
+
       public async postCommentToQuestion(req: Request, res: Response) {
         const {
           pergunta_ID,
@@ -291,7 +337,6 @@ class communityController {
 
         const data = nowDate;
 
-  
         const sql: typeof sqlType = `INSERT INTO comentario_pergunta 
         (id, pergunta_ID, data, autor_name, comentario_Txt) VALUES (?,?,?, ?, ?)`
 
@@ -303,29 +348,50 @@ class communityController {
         })
       }
 
+      public async getCommentsQuestion(req: Request, res: Response) {
+        const {
+          pergunta_ID
+        } = req.params;
+ 
+        if (!pergunta_ID) {
+          res.status(404).send('No user id provided.')
+        }
+  
+        const sql: typeof sqlType = `
+        SELECT comentario_Txt
+        FROM comentario_pergunta
+        WHERE pergunta_ID=?
+        `
+
+        db.query(sql, [pergunta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          res.status(200).send(result)
+        })
+      }
+
       public async likeAnswer (req: Request, res: Response) {
         const {
           resposta_id,
           autor_like
-        } = req.body
+        } = req.body;
  
         if(!resposta_id || !autor_like) {
           res.status(404).send('Data not found.')
-        }
-
+        }; 
+   
         const id = uuidv4();
-
+   
         const data = nowDate;
 
         const sql: typeof sqlType = `INSERT INTO respostas_likes 
         (id, data, resposta_id, autor_like) VALUES (?,?,?,?)`
-
+ 
 
         db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
           if (err) throw err;
           res.status(200).json({
             comentario: JSON.stringify(result)
-          })
+          }) 
         })
       }
 
@@ -350,7 +416,32 @@ class communityController {
             likes: result.length
           })
         }) 
+      }
+
+      public listSelfLikesAnswer (req: Request, res: Response) {
+        const {
+          autor_like,
+          resposta_id
+        } = req.params;
+
+        if (!autor_like || !resposta_id) {
+          res.status(404).send('Data not found.')
+        }
+ 
+        const sql: typeof sqlType = `
+        SELECT autor_like
+        FROM respostas_likes
+        WHERE (autor_like=? AND resposta_id=?)
+        `
+
+        db.query(sql, [autor_like, resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          res.status(200).json({
+            likes: result.length
+          })
+        }) 
       } 
+
 }
 
 module.exports = new communityController();
