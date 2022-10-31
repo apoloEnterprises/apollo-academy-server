@@ -58,7 +58,7 @@ public async insertCourse(req: Request, res: Response) {
 
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
+ 
     const {
       nome,
       descricao,
@@ -86,7 +86,7 @@ public async insertCourse(req: Request, res: Response) {
  
       const sqlCategory: typeof sqlType = `
       INSERT INTO curso_category
-      (id_curso, categoria, sub_categoria, item)
+      (nome_curso, categoria, sub_categoria, item)
       VALUES (?,?,?,?) 
       ` 
    
@@ -95,11 +95,11 @@ public async insertCourse(req: Request, res: Response) {
         const [course] = result
         console.log(course);
         
-          db.query(sqlCategory, [id, categoria, sub_categoria, item], function (err: Error, result: typeof ResultQueryInsertCourse[]) {
+          db.query(sqlCategory, [nome, categoria, sub_categoria, item], function (err: Error, result: typeof ResultQueryInsertCourse[]) {
           if (err) throw err;
           
           res.status(200).send('Course Created Successfully.')
-
+ 
           
           // db.query(sqlSelect, )
         })
@@ -347,32 +347,32 @@ public async insertWatching(req: Request, res: Response) {
 
      public async inscreverCursoAluno(req: Request, res: Response): Promise<void> {
       const {
-        id_curso,
+        nome_curso,
         id_aluno,
       } = req.body
 
-      if (!id_curso || !id_aluno) {
+      if (!nome_curso || !id_aluno) {
         res.status(404).json({
           message: 'Needed data not found.'
         })
-      }
+      } 
 
       const id = uuidv4();
 
       const sqlInsertInto: typeof sqlType = `
-      INSERT INTO curso_alunos (id, id_curso, id_aluno)
-      VALUES (?,?,?)
+      INSERT INTO curso_alunos (id, nome_curso, id_aluno)
+      VALUES (?,?,?)  
       `
-
+ 
       const sqlSelect: typeof sqlType = `
       SELECT *
       FROM curso
       WHERE id=?
       `
   
-      db.query(sqlInsertInto, [id, id_curso, id_aluno], async function (err: Error, result: any) {
+      db.query(sqlInsertInto, [id, nome_curso, id_aluno], async function (err: Error, result: any) {
         if (err) throw err;
-        db.query(sqlSelect, [id_curso], async function (err: Error, result: any) {
+        db.query(sqlSelect, [nome_curso], async function (err: Error, result: any) {
           if (err) throw err;
           const re = await result
           res.send(re)
@@ -381,6 +381,34 @@ public async insertWatching(req: Request, res: Response) {
 
      }
 
+     public async getAlunoCursos(req: Request, res: Response) {
+      const {
+        id
+      } = req.params
+
+      if(!id) {
+        res.status(404).send('No id provided.')
+      }
+
+      const sqlSelect: typeof sqlType = `
+      SELECT nome_curso
+      FROM curso_alunos
+      WHERE id_aluno=?
+      `
+
+      const sqlSelectRe: typeof sqlType = `
+      SELECT *
+      FROM curso
+      WHERE id=?
+      ` 
+
+      db.query(sqlSelect, [id], async function (err: Error, result: any) {
+        if (err) throw err;
+        // console.log(result);
+        res.send(result)
+      })
+    }
+ 
      public async getMediaNota(req: Request, res: Response) {
       const {
         id_curso

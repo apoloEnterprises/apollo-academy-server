@@ -58,7 +58,7 @@ class communityController {
     type sqlType = string;
 
     const sql: sqlType = `
-    SELECT pergunta_Txt, pergunta_Descr, categoria FROM perguntas WHERE autor_name=?
+    SELECT pergunta_Txt, id FROM perguntas WHERE autor_name=?
     `;
 
       db.query(sql, [id], async function (err: Error, result: typeof ResultQueyPost[]) {

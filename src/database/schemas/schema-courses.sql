@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `curso` (
   `foto_capa` varchar(255) NOT NULL,
   `autor` varchar(100),
   `idioma` varchar(100),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`nome`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `usuario_curso_assistido` (
@@ -38,14 +38,14 @@ CREATE TABLE IF NOT EXISTS `usuario_curso_assistindo` (
 -- envia como: programacao, backend, node js
 CREATE TABLE IF NOT EXISTS `curso_category` (
    `id` int(255) NOT NULL AUTO_INCREMENT,
-   `id_curso` varchar(255),
+   `nome_curso` varchar(255),
   `categoria` varchar(120) NOT NULL,
   `sub_categoria` varchar(255) NOT NULL,
   `sub_categoria2` varchar(255),
   `sub_categoria3` varchar(255),
   `item` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE
+  FOREIGN KEY (`nome_curso`) REFERENCES curso(nome) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `curso_aulas` (
@@ -84,8 +84,9 @@ CREATE TABLE IF NOT EXISTS `curso_avaliacoes` (
 CREATE TABLE IF NOT EXISTS `curso_alunos` (
    `id` varchar(255) UNIQUE NOT NULL,
    `data` TIMESTAMP DEFAULT NOW(),
-   `id_curso` varchar(255),
-   `id_aluno` varchar(255) UNIQUE NOT NULL,
+   `nome_curso` varchar(120) NOT NULL,
+   `id_aluno` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE
+  FOREIGN KEY (`nome_curso`) REFERENCES curso(nome),
+  FOREIGN KEY (`id_aluno`) REFERENCES usuarios(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

@@ -34,11 +34,10 @@ router.get('/community/post-answer/:id', communityController.getPostAndAnswers);
 // --------------------**********------------------------
 
 // --------------------ranking and thrphy routes-------------------------
-// router.post('/level-up', rankingsController.userLevelUp);
-// router.post('/level/insert-exp', rankingsController.insertXP);
+router.get('/question-trophy/:name/:id_user', rankingsController.QuestionTrophy);
 // --------------------**********------------------------
 
-// --------------------courses------------------------- 
+// --------------------courses-------------------------  
 router.post('/watching', coursesController.verifyWatched);
 router.post('/insert-course', coursesController.insertCourse);
 router.post('/get-course-category', coursesController.getCourseAndCategory);
@@ -47,12 +46,14 @@ router.post('/insert-category', coursesController.insertCourseCategory);
 router.post('/insert-aula', coursesController.insertAula);
 router.post('/insert-modulo', coursesController.insertModolo); 
 router.post('/get-modules', coursesController.getModules); 
-router.post('/get-aulas', coursesController.getAulas);  
-router.post('/send-rating', coursesController.sendRating);  
+router.post('/get-aulas', coursesController.getAulas);   
+router.post('/send-rating', coursesController.sendRating);   
 router.post('/inscrever-curso-aluno', coursesController.inscreverCursoAluno);  
 router.get('/get-media-nota/:id_curso', coursesController.getMediaNota);  
 router.get('/get-alunos/:id_aluno', coursesController.getNumAlunos);  
-router.get('/get-courses-feed', coursesController.returnCursoFeed);  
+router.get('/get-courses-feed', coursesController.returnCursoFeed); 
+router.get('/get-aluno-cursos/:id', coursesController.getAlunoCursos);   
+
 // router.post('/aula-1', coursesController.hostCourse);
 // --------------------**********------------------------
 
