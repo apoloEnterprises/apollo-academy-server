@@ -516,6 +516,105 @@ public async insertWatching(req: Request, res: Response) {
       })
       
      }
+
+     public async insertIntoMyFavList (req: Request, res: Response) {
+      const {
+        id_aluno,
+        nome_curso
+      } = req.body
+
+      if (!id_aluno || !nome_curso) {
+        res.status(404).send('No data provided')
+      }
+
+      const id = uuidv4();
+
+
+      const sqlInsertInto: typeof sqlType = `
+      INSERT INTO curso_favorito (id, nome_curso, id_aluno)
+      VALUES (?,?,?)  
+      `
+
+      db.query(sqlInsertInto, [id, nome_curso, id_aluno], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.status(200).json({
+          re: result
+        })
+     })
+
+    }
+
+    public async insertIntoDownload (req: Request, res: Response) {
+      const {
+        id_aluno,
+        nome_curso
+      } = req.body
+
+      if (!id_aluno || !nome_curso) {
+        res.status(404).send('No data provided')
+      }
+
+      const id = uuidv4();
+      
+
+      const sqlInsertInto: typeof sqlType = `
+      INSERT INTO curso_download (id, id_aluno, nome_curso)
+      VALUES (?,?,?)  
+      `
+      
+      db.query(sqlInsertInto, [id, id_aluno, nome_curso], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.status(200).json({
+          re: result
+        })
+     })
+    }
+
+    public async getMyList(req: Request, res: Response) {
+      const {
+        id_aluno,
+      } = req.params;
+
+      if (!id_aluno) {
+        res.status(404).send('No data provided')
+      }
+
+
+      const sqlSelect: typeof sqlType = `
+      SELECTT *
+      FROM curso_favorito
+      WHERE id_aluno=?
+      `
+
+      db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.status(200).send(result);
+     })
+
+    }
+
+    public async getDownloads(req: Request, res: Response) {
+      const {
+        id_aluno,
+      } = req.params;
+
+      if (!id_aluno) {
+        res.status(404).send('No data provided')
+      }
+
+
+      const sqlSelect: typeof sqlType = `
+      SELECTT *
+      FROM curso_download
+      WHERE id_aluno=?
+      `
+
+      db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.status(200).send(result);
+     })
+
+    }
 }
 
 module.exports = new coursesController();

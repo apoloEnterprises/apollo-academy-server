@@ -34,11 +34,16 @@ router.get('/community/post-answer/:id', communityController.getPostAndAnswers);
 // --------------------**********------------------------
 
 // --------------------ranking and thrphy routes-------------------------
-router.get('/question-trophy/:name/:id_user', rankingsController.QuestionTrophy);
+router.get('/question-trophy/:name/:id_user', rankingsController.trophy);
+router.get('/total-user-trophies/:nome', rankingsController.getTotalUserTrophies); 
+router.get('/list-user-each-trophy/:nome', rankingsController.getUserEachTrophyNumber);
+
 // --------------------**********------------------------
 
 // --------------------courses-------------------------  
-router.post('/watching', coursesController.verifyWatched);
+router.post('/watching', coursesController.verifyWatched); 
+router.post('/insert-my-list', coursesController.insertIntoMyFavList);
+router.post('/insert-download', coursesController.insertIntoDownload);
 router.post('/insert-course', coursesController.insertCourse);
 router.post('/get-course-category', coursesController.getCourseAndCategory);
 router.post('/insert-watcing', coursesController.insertWatching);

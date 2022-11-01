@@ -90,3 +90,23 @@ CREATE TABLE IF NOT EXISTS `curso_alunos` (
   FOREIGN KEY (`nome_curso`) REFERENCES curso(nome),
   FOREIGN KEY (`id_aluno`) REFERENCES usuarios(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `curso_favorito` (
+   `id` varchar(255) UNIQUE NOT NULL,
+   `data` TIMESTAMP DEFAULT NOW(),
+   `nome_curso` varchar(120) NOT NULL,
+   `id_aluno` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`nome_curso`) REFERENCES curso(nome),
+  FOREIGN KEY (`id_aluno`) REFERENCES usuarios(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `curso_download` (
+   `id` varchar(255) UNIQUE NOT NULL,
+   `data` TIMESTAMP DEFAULT NOW(),
+   `nome_curso` varchar(120) NOT NULL,
+   `id_aluno` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`nome_curso`) REFERENCES curso(nome),
+  FOREIGN KEY (`id_aluno`) REFERENCES usuarios(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
