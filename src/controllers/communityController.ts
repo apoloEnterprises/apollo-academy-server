@@ -368,7 +368,7 @@ class communityController {
           res.status(200).send(result)
         })
       }
-
+   
       public async likeAnswer (req: Request, res: Response) {
         const {
           resposta_id,
@@ -378,7 +378,7 @@ class communityController {
         if(!resposta_id || !autor_like) {
           res.status(404).send('Data not found.')
         }; 
-   
+    
         const id = uuidv4();
    
         const data = nowDate;

@@ -31,7 +31,7 @@ class userController {
     WHERE 
         nomeDeUsuario=?
     `;
-
+ 
     if(categoria && nomeDeUsuario && subCategoria3 && subCategoria1 && subCategoria2) {
       db.query(`SELECT * FROM usuarios where nomeDeUsuario=?`, [nomeDeUsuario], function (err: Error): void {
         if (err) throw err;
