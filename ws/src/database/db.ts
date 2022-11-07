@@ -1,0 +1,19 @@
+const mysql2 = require('mysql2');
+
+const db2 = mysql2.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'sql',
+  database: 'apollo',
+});
+
+db2.connect((error: string): void => {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('🔥 Conectado ao banco de dados');
+  }
+});
+
+
+module.exports = db2;

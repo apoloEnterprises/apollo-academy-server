@@ -4,7 +4,7 @@ var http = require('http'),
     util = require('util');
 
 http.createServer(function (req, res) {
-  var path = './videos/aula-1.mp4';
+  var path = './aula-1.mp4';
   var stat = fs.statSync(path);
   var total = stat.size;
   if (req.headers['range']) {

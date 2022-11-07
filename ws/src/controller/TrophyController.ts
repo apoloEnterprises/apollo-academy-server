@@ -1,19 +1,16 @@
-import { log } from 'console';
+const db = require('../database/db')
 import { Request, Response } from 'express';
-const db = require('../database/db');
-const sqlType = require('./types/sqlTyped');
-const { nowDate } = require('./exports/getData')
+const sqlType = require('../../../src/../src/controllers/types/sqlTyped');
+const { nowDate } = require('../../../src/controllers/exports/getData')
 const { v4: uuidv4 } = require('uuid');
+import * as WebSocket from 'ws';
 
-
-// trophies, rankings and levels of user
-
-class rankingsController {
- public async trophy(req: Request, res: Response) {
+class VideoController {
+  public async trophy(req: Request, res: Response) {
     const {
       name,
       id_user
-      } = await req.params;  
+      } = await req.body;  
 
       if (!name) {
         res.status(404).send('No id provided.')
@@ -37,7 +34,7 @@ class rankingsController {
       const sqlSelectTrophy: typeof sqlType = `
       SELECT *  
       FROM trofeus_conquistado
-      WHERE trofeu_nome=? AND usuario_nome=?
+      WHERE (trofeu_nome=? AND usuario_nome=?)
       `   
 
       const sqlUpdate: typeof sqlType = `
@@ -309,7 +306,7 @@ class rankingsController {
             })
           })
         }
-        }) 
+        })
       } else if ( re === 5) {
         const troufeu_nome = 'Da comunidade'
         const troufeu_tipo = 'Ouro'
@@ -645,106 +642,10 @@ class rankingsController {
     //   res.send(result)
     // })
 
-    }
- 
-    public async getTotalUserTrophies(req: Request, res: Response) {
-      const {
-        nome
-      } = req.params;
+    console.log('eae kk');
+    
 
-      if(!nome) {
-        res.status(404).send('No username provded.')
-      }
- 
-      const sqlGet: typeof sqlType = `
-      SELECT trofeu_tipo
-      FROM trofeus_conquistado
-      WHERE usuario_nome=?
-      `
-
-      db.query(sqlGet, [nome], function (err: Error, result: any) {
-        if (err) throw err;
-        const re = result.length
-        res.status(200).json({
-          trofeus: re
-        }) 
-      })
-    }
-
-    public async getUserEachTrophyNumber(req: Request, res: Response) {
-      const {
-        nome
-      } = req.params;
-
-      if (!nome) {
-        res.status(404).send('No username provided')
-      }
-
-      const sqlGetBronze: typeof sqlType = `
-      SELECT trofeu_tipo
-      FROM trofeus_conquistado
-      WHERE (usuario_nome=? AND trofeu_tipo=?)
-      `
-
-      const sqlGetPrata: typeof sqlType = `
-      SELECT trofeu_tipo
-      FROM trofeus_conquistado
-      WHERE usuario_nome=? AND trofeu_tipo=?
-      `
-
-      const sqlGetOuro: typeof sqlType = `
-      SELECT trofeu_tipo
-      FROM trofeus_conquistado
-      WHERE usuario_nome=? AND trofeu_tipo=?
-      `
-
-      const sqlGetApollo: typeof sqlType = `
-      SELECT trofeu_tipo
-      FROM trofeus_conquistado
-      WHERE usuario_nome=? AND trofeu_tipo=?
-      `
-
-      db.query(sqlGetBronze, [nome, 'bronze'], function (err: Error, result: any) {
-        if (err) throw err;
-        const bronze = result.length
-        db.query(sqlGetPrata, [nome, 'prata'], function (err: Error, result: any) {
-          if (err) throw err;
-          const prata = result.length
-          db.query(sqlGetOuro, [nome, 'ouro'], function (err: Error, result: any) {
-            if (err) throw err;
-            const ouro = result.length
-            db.query(sqlGetApollo, [nome, 'apollo'], function (err: Error, result: any) {
-              if (err) throw err;
-              const apollo = result.length
-              res.status(200).json({
-                bronze: bronze,
-                prata: prata,
-                ouro: ouro,
-                apollo: apollo
-              })
-            })
-          })
-        })
-      })
-    }
-
-    public async buyCourse(req: Request, res: Response) {
-      const {
-        username
-      } = req.body;
-
-      if (!username) {
-        res.status(404).send('No data provided,')
-      }
-
-      const sql: typeof sqlType = `
-      UPDATE coins
-      SET coins=1
-      WHERE nomeDeUsuario=?
-      `
-
-      
     }
 }
 
-module.exports = new rankingsController();
+module.exports = new VideoController();

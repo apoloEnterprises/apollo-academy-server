@@ -14,7 +14,7 @@
 //   });
 //   };
 
-//   async createUser({nomeDeUsuario: string, email, senha, trofeus = 0, categoria = 0, subCategoria1 = 0, subCategoria2 = 0, subCategoria3 = 0}) {
+//   async crateUser({nomeDeUsuario: string, email, senha, trofeus = 0, categoria = 0, subCategoria1 = 0, subCategoria2 = 0, subCategoria3 = 0}) {
 
 //     // const otherData = {trofeus: 0, categoria: 0, subCategoria1: 0, subCategoria2: 0, subCategoria3: 0};
 //     interface ResultQuey {

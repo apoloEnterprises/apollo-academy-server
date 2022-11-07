@@ -8,9 +8,10 @@ const sqlType = require('./types/sqlTyped');
 const {
   ResultQueyUser,ResultQueyPost} = require('./types/resultTyped');
 const {  ResultQueryInsertCategory } = require('./types/shortResultTyped');
+const sha256 = require('sha256');
  
 // user first actions - login, sign up, first choice of cateogries etc..
- 
+  
 class userController {
  public async index (req: Request, res: Response) {
     const {
@@ -66,7 +67,7 @@ class userController {
     
     const id = uuidv4();
 
-    const password = uuidv4(senha)
+    const password = sha256(senha)
 
     if (!nomeDeUsuario) {
       res.status(404).send('No user provided.')
@@ -85,12 +86,15 @@ class userController {
         db.query(`INSERT INTO usuarios
         (id, nomeDeUsuario, email, senha) VALUES (?,?,?,?)`, [id, nomeDeUsuario, email, password], async function (err: Error, result: ResultQuey[]) {
           if (err) throw err;
-          res.status(200).send(`User created successfully: ${nomeDeUsuario}`)      
+          res.status(200).json({
+            status: nomeDeUsuario,
+            id
+          })      
         })}
      })}
     ) 
-  }
-
+  }  
+ 
   public async getIn(req: Request, res: Response) {
     const {
       nomeDeUsuario,
@@ -105,10 +109,12 @@ class userController {
     }
 
     const sql: typeof sqlType = `
-    SELECT nomeDeUsuario, email, senha
+    SELECT id, nomeDeUsuario, email, senha
     FROM usuarios
     WHERE nomeDeUsuario=?
     `;
+
+    const senhauuid = sha256(senha)
 
     if(!nomeDeUsuario) {
       res.status(404).send('Email or username not found.');
@@ -118,13 +124,18 @@ class userController {
       if(err) throw err;
       const ResultUsername = result[0]?.nomeDeUsuario;
       const ResultPassword = result[0]?.senha;
+      const resultid = result[0]?.id;
+      console.log(ResultPassword);
+      console.log(senhauuid);
+      
 
-      if(nomeDeUsuario === ResultUsername && senha === ResultPassword) {
+      if(nomeDeUsuario === ResultUsername && senhauuid === ResultPassword) {
         res.status(200).send({
-          status: `logged in successfully as ${nomeDeUsuario}`
+          status: nomeDeUsuario,
+          id: resultid
         }) 
       } else {
-        res.status(404).send({
+        res.status(400).send({
           status: 'Username or password is not valid.'
         })
       }
@@ -207,6 +218,248 @@ class userController {
      })
 
    }
+
+   public async checkUserName(req: Request, res: Response) {
+    const {
+      name
+    } = req.body;
+
+    if (!name) {
+      res.status(404).send('No name provided.')
+    }
+
+    const sqlName: typeof sqlType = `
+    SELECT nomeDeUsuario
+    FROM usuarios
+    WHERE nomeDeUsuario=?
+    `
+    
+
+    db.query(sqlName, [name], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      if (result.length > 0) {
+        res.status(400).json({
+          inUse: true
+        })
+      } else {
+        res.status(200).json({
+          inUse: false
+        })
+      }
+     })
+    
+   }
+
+   public async changeUsername(req: Request, res: Response) {
+    const {
+      id_user,
+      name
+    } = req.body;
+
+    if(!id_user) {
+      res.status(404).send('no id provided.')
+    }
+
+    const sql: typeof sqlType = `
+    UPDATE usuarios
+    SET nomeDeUsuario=?
+    WHERE id=?
+    `
+
+    db.query(sql, [name, id_user], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      res.status(200).send(result)
+     })
+
+   }
+
+   public async insertFullname(req: Request, res: Response) {
+    const {
+      id_usuario,
+      nome_completo
+    } = req.body;
+
+    if (!id_usuario || !nome_completo) {
+      res.status(404).send('no data provided.')
+    }
+
+    const id = uuidv4();
+
+
+    const sql: typeof sqlType = `
+    INSERT INTO usuario_nomeCompleto (id, id_usuario, nome_completo)
+    VALUES (?, ?, ?)
+    `
+
+    db.query(sql, [id, id_usuario, nome_completo], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      res.status(200).send(result)
+     })
+   }
+
+   public async findFullName (req: Request, res: Response) {
+    const {
+      id_usuario
+    } = req.params;
+
+    if (!id_usuario) {
+      res.status(404).send('No id provided')
+    }
+
+    const sql: typeof sqlType = `
+    SELECT *
+    FROM usuario_nomeCompleto
+    WHERE id_usuario=?
+    `
+
+    db.query(sql, [id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      console.log(result);
+      
+      if (result.length >= 1) {
+        res.status(200).send(result)
+      } else {
+        res.status(400).send('No name found.')
+      }
+     })
+   }
+
+   public async changeSettingShowFullname(req: Request, res: Response) {
+    const {
+      id_usuario,
+    } = req.body;
+
+    if (!id_usuario) {
+      res.status(404).send('No id provided.')
+    }
+
+    const sqlSelect: typeof sqlType = `
+    SELECT *
+    FROM usuario_nomeCompleto
+    WHERE id_usuario=?
+    `
+
+    const sql: typeof sqlType = `
+    UPDATE usuario_nomeCompleto
+    SET mostrar=?
+    WHERE id_usuario=?
+    `
+    
+    db.query(sqlSelect, [id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      const mostrar = result[0].mostrar;
+      
+      if (mostrar == 0) {
+        db.query(sql, [1, id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+          if (err) throw err;
+          res.status(200).json({
+            mostrar : mostrar
+          });
+         }) 
+      } else if (mostrar == 1 ) {
+        db.query(sql, [0, id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+          if (err) throw err;
+          res.status(200).json({
+            mostrar : mostrar
+          });
+         })
+      }
+     }) 
+   }
+
+   public async getConfigFullname (req: Request, res: Response) {
+    const {
+      id_usuario
+    } = req.body;
+
+    if (!id_usuario) {
+      res.status(404).send('No id provided.')
+    }
+
+    const sqlSelect: typeof sqlType = `
+    SELECT *
+    FROM usuario_nomeCompleto
+    WHERE id_usuario=?
+    ` 
+
+    db.query(sqlSelect, [id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+      // const mostrar = result;
+      if (result.length >= 1) {
+        const mostrar = result[0].mostrar;
+        console.log(mostrar);
+        
+        if (mostrar == 1) {
+          res.status(200).json({
+            mostrar: true
+          })
+        } else if (mostrar == 0) {
+          res.status(200).json({
+            mostrar: false
+          })
+        }
+      } else {
+        res.status(200).json({
+          mostrar: false
+        })
+      }
+     }) 
+   }
+
+   public async findVistoSlide (req: Request, res: Response) {
+    const {
+      id_usuario
+    } = req.params;
+
+    if (!id_usuario) {
+      res.status(404).send('No id provided')
+    }
+
+    const sql: typeof sqlType = `
+    SELECT *
+    FROM slides
+    WHERE id_usuario=?
+    `
+
+    db.query(sql, [id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
+      if (err) throw err;
+        if (result.length >= 1) {
+          res.status(200).json({
+            visto: true
+          })
+        } else {
+          res.status(400).json({
+            visto: false
+          })
+        }
+
+     })
+   }
+
+   public async insertSlideVisto (req: Request, res: Response) {
+    const {
+      id_usuario
+    } = req.body
+
+    if (!id_usuario) {
+      res.status(404).send('No data provided')
+    }
+
+    const id = uuidv4();
+     
+ 
+    const sqlInsertInto: typeof sqlType = `
+    INSERT INTO slides (id, id_usuario)
+    VALUES (?,?)  
+    `  
+    
+    db.query(sqlInsertInto, [id, id_usuario], async function (err: Error, result: any) {
+      if (err) throw err;
+      res.status(200).json({
+        re: result
+      })
+   })
+  }
 }
 
 module.exports = new userController();

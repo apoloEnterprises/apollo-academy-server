@@ -114,7 +114,7 @@ public async getCourseAndCategory(req: Request, res: Response) {
   if (!id) {
     res.status(404).send('ID not found.')
   }
-
+  
   const sqlSelect: typeof sqlType = `
   SELECT *
   FROM curso
@@ -253,7 +253,7 @@ public async insertWatching(req: Request, res: Response) {
       INSERT INTO curso_modulos (id, id_curso, nome_modulo, modulo_ordem) 
       VALUES (?, ?, ?, ?)
       `
- 
+  
       db.query(sql, [id, id_curso, nome_modulo, modulo_ordem], async function (err: Error, result: any) {
         if(err) throw err;
         res.send(result)
@@ -362,7 +362,7 @@ public async insertWatching(req: Request, res: Response) {
       const sqlInsertInto: typeof sqlType = `
       INSERT INTO curso_alunos (id, nome_curso, id_aluno)
       VALUES (?,?,?)  
-      `
+      `  
  
       const sqlSelect: typeof sqlType = `
       SELECT *
@@ -614,6 +614,51 @@ public async insertWatching(req: Request, res: Response) {
         res.status(200).send(result);
      })
 
+    }
+
+    public async getTime(req: Request, res: Response) {
+      const {
+        id_usuario,
+        id_curso
+      } = req.body;
+
+      if (!id_curso || !id_usuario) {
+        res.status(404).send('No data provided.')
+      }
+ 
+      const sqlSelect: typeof sqlType = `
+      SELECT timestamp
+      FROM usuario_curso_assistindo
+      WHERE (id_curso=? AND id_usuario=?)
+      `
+
+      db.query(sqlSelect, [id_curso, id_usuario], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.status(200).send(result);
+     }) 
+    }
+
+    public async getliked(req: Request, res: Response) {
+      const {
+        id_aluno,
+        nome_curso
+      } = req.body;
+
+      if (!nome_curso || !id_aluno) {
+        res.status(404).send('No data provided.')
+      } 
+     
+      const sqlSelect: typeof sqlType = `
+      SELECT *
+      FROM curso_favorito
+      WHERE (nome_curso=? AND id_aluno=?)
+      `
+
+      db.query(sqlSelect, [nome_curso, id_aluno], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.status(200).send(result);
+     }) 
+      
     }
 }
 
