@@ -19,4 +19,3 @@ const day_value = current_date.getDate();
 const year_value = current_date.getFullYear();
 
 export const nowDate = day_value + " de " + months[month_value] + ", " + year_value;
-console.log(nowDate);

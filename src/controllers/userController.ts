@@ -11,11 +11,11 @@ const {  ResultQueryInsertCategory } = require('./types/shortResultTyped');
 const sha256 = require('sha256');
  
 // user first actions - login, sign up, first choice of cateogries etc..
-  
+   
 class userController {
  public async index (req: Request, res: Response) {
     const {
-      subCategoria1,
+      subCategoria1, 
       subCategoria2,
       subCategoria3,
       nomeDeUsuario,
@@ -31,13 +31,13 @@ class userController {
         subCategoria3=?
     WHERE 
         nomeDeUsuario=?
-    `;
- 
+    `;   
+            
     if(categoria && nomeDeUsuario && subCategoria3 && subCategoria1 && subCategoria2) {
       db.query(`SELECT * FROM usuarios where nomeDeUsuario=?`, [nomeDeUsuario], function (err: Error): void {
         if (err) throw err;
             db.query(sql, [categoria, subCategoria1, subCategoria2, subCategoria3,nomeDeUsuario], function (err: Error): void {
-              if (err) throw err;
+               if (err) throw err;
                 res.status(200).json({
                 categoria: `${categoria}`,
                 subCategoria1: `${subCategoria1}`,
@@ -100,7 +100,10 @@ class userController {
       nomeDeUsuario,
       senha
     } = req.body;
-
+    console.log(nomeDeUsuario);
+    console.log(senha);
+    
+ 
     interface ResultQuey {
       id: number,
       nomeDeUsuario: string,
@@ -114,7 +117,9 @@ class userController {
     WHERE nomeDeUsuario=?
     `;
 
-    const senhauuid = sha256(senha)
+    const senhauuid = sha256(JSON.stringify(senha))
+
+    
 
     if(!nomeDeUsuario) {
       res.status(404).send('Email or username not found.');
@@ -127,6 +132,8 @@ class userController {
       const resultid = result[0]?.id;
       console.log(ResultPassword);
       console.log(senhauuid);
+      console.log(ResultUsername);
+      
       
 
       if(nomeDeUsuario === ResultUsername && senhauuid === ResultPassword) {
@@ -447,8 +454,8 @@ class userController {
 
     const id = uuidv4();
      
- 
-    const sqlInsertInto: typeof sqlType = `
+  
+     const sqlInsertInto: typeof sqlType = `
     INSERT INTO slides (id, id_usuario)
     VALUES (?,?)  
     `  

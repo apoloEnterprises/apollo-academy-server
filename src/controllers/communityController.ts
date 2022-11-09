@@ -70,7 +70,7 @@ class communityController {
   public async getPostByCategory(req: Request, res: Response) {
     const {
       categoria, subCategoria
-    } = await req.params;
+    } = req.params;
 
     const sql: typeof sqlType = `
     SELECT *
@@ -103,12 +103,12 @@ class communityController {
           if (err) throw err;
           // const user = result[0].autor_name
           // const re = result[0]
-          res.status(200).send(result)
+                   res.status(200).send(result)
         })
     }
+    
 
-
-    // if (categoria && !subCategoria) {
+    // if (categoria &&  !subCategoria) {
     //   db.query(sql, [categoria], 
     //     async function (err: Error, result: typeof ResultQueyCateogry[]) {
     //       if (err) throw err;
@@ -389,7 +389,7 @@ class communityController {
 
         db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
           if (err) throw err;
-          res.status(200).json({
+          return res.status(200).json({
             comentario: JSON.stringify(result)
           }) 
         })
