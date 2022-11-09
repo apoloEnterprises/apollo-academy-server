@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `respostas_likes` (
   FOREIGN KEY (`autor_like`) REFERENCES usuarios(nomeDeUsuario) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
-
+  
 CREATE TABLE IF NOT EXISTS `comentarios` (
   `id` varchar(100) NOT NULL,
   `data` varchar(100) NOT NULL,

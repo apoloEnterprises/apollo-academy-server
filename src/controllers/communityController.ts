@@ -378,7 +378,7 @@ class communityController {
         if(!resposta_id || !autor_like) {
           res.status(404).send('Data not found.')
         }; 
-    
+      
         const id = uuidv4();
    
         const data = nowDate;
@@ -392,8 +392,8 @@ class communityController {
           return res.status(200).json({
             comentario: JSON.stringify(result)
           }) 
-        })
-      }
+        })                                   
+      } 
 
       public listLikesAnswer (req: Request, res: Response) {
         const {

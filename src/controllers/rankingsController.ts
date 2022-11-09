@@ -38,14 +38,13 @@ class rankingsController {
       SELECT *  
       FROM trofeus_conquistado
       WHERE trofeu_nome=? AND usuario_nome=?
-      `   
+      `  
 
       const sqlUpdate: typeof sqlType = `
       UPDATE trofeus_conquistado
       SET conquistado=1
       WHERE trofeu_nome=?
       `
-
       
       const sqlRespostas: typeof sqlType = `
       SELECT *
@@ -66,10 +65,44 @@ class rankingsController {
       db.query(sql, [name], async function (err: Error, result: any) {
         if (err) throw err;
         const pergunta_length = result.length;
+        
+        const troufeu_nome_bronze_pergunta = {
+          troufeu_nome: 'O curisoso',
+          troufeu_tipo: 'Bronze'
+        };
+
+        const troufeu_nome_prata_pergunta = {
+          troufeu_nome: 'Comunicador',
+          troufeu_tipo: 'Prata'
+        };
+
+        const troufeu_nome_ouro_pergunta = {
+          troufeu_nome: 'Tagarela',
+          troufeu_tipo: 'Ouro'
+        };
+
+
 
         db.query(sqlRespostas, [name], function (err: Error, result: any) {
           if (err) throw err;
           const resposta_length = result.length;
+
+          const troufeu_nome_bronze_resposta = {
+            troufeu_nome: 'Ajudante',
+            troufeu_tipo: 'Bronze'
+          };
+  
+          const troufeu_nome_prata_resposta = {
+            troufeu_nome: 'Networking',
+            troufeu_tipo: 'Prata'
+          };
+  
+          const troufeu_nome_ouro_resposta = {
+            troufeu_nome: 'Mentor',
+            troufeu_tipo: 'Ouro'
+          };
+  
+  
     
           db.query(sqlLikes, [name], function (err: Error, result: any) {
             if (err) throw err;
@@ -86,378 +119,412 @@ class rankingsController {
               const chec2 = resposta_length >= 1 || resposta_length === 3 || resposta_length === 5;
               const chec3 = likes_length >= 1  || likes_length === 3 || likes_length === 5
               const chec4 = curso_length >= 1 || curso_length === 3 || curso_length === 5
-              console.log('pergunta + ' + check);
-              console.log('resposta: ' + chec2);
-              console.log('like: ' + chec3);
-              console.log('curso: ' + chec4);
-              
-              
-              if (pergunta_length === 1 || pergunta_length === 3 || pergunta_length === 5 ) {
-                console.log('pergunta');
+              // console.log('pergunta + ' + check);
+              // console.log('resposta: ' + chec2);
+              // console.log('like: ' + chec3);
+              // console.log('curso: ' + chec4);
+  
+
                 
 
-                if (pergunta_length === 1) {
+                db.query(sqlSelectTrophy, [troufeu_nome_bronze_pergunta.troufeu_nome, name], function (err: Error, result: any) {
+                  if (err) throw err;
+                  const trofeu_bronze_pergunta_existe = result
+                  console.log(trofeu_bronze_pergunta_existe.length);
                   
-                  if (pergunta_length === 1 ) {
-                    const troufeu_nome = 'O curisoso'
-                    const troufeu_tipo = 'Bronze'        
-                
-                    db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+                  db.query(sqlSelectTrophy, [troufeu_nome_prata_pergunta.troufeu_nome, name], function (err: Error, result: any) {
+                    if (err) throw err;  
+                    const trofeu_prata_pergunta_existe = result
+                    console.log(trofeu_prata_pergunta_existe.length);
+                    
+                    db.query(sqlSelectTrophy, [troufeu_nome_ouro_pergunta.troufeu_nome, name], function (err: Error, result: any) {
                       if (err) throw err;
-                      const re = result.length
-                      const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado;          
+                      const trofeu_ouro_pergunta_existe = result
+                      console.log(trofeu_ouro_pergunta_existe.length);
+                      
+                      db.query(sqlSelectTrophy, [troufeu_nome_bronze_resposta.troufeu_nome, name], function (err: Error, result: any) {
+                        if (err) throw err;
+                        
+                        if (trofeu_bronze_pergunta_existe.length === 0 && pergunta_length === 1 || trofeu_prata_pergunta_existe.length === 0 && pergunta_length === 3 || trofeu_ouro_pergunta_existe.length === 0 && pergunta_length === 5) {
+                          res.send('tem')
+                        } else {
+                          res.send('no trophy')
+                        }
+                        
+      
+                      })
+                    })
+                  })
+                })
+
+
+
+              
+              
+//               if (pergunta_length === 1 || pergunta_length === 3 || pergunta_length === 5 ) {
+//                 console.log('pergunta');
+                
+
+//                 if (pergunta_length === 1) {
                   
-                      if (trofeu === 0 && re === 1) {
-                        db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                          res.status(200).json({
-                            troufeu_nome: troufeu_nome,
-                            troufeu_tipo: troufeu_tipo
-                          })
-                        })
-                    } else if (trofeu === 0 && re === 0)  { 
-                      db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                        if (err) throw err;
-                        db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                          res.status(200).json({
-                            troufeu_nome: troufeu_nome,
-                            troufeu_tipo: troufeu_tipo
-                          })
-                        })
-                      })
-                    } 
-                    })
+//                   if (pergunta_length === 1 ) {
+//                     const troufeu_nome = 'O curisoso'
+//                     const troufeu_tipo = 'Bronze'        
                 
-                } else if (pergunta_length === 3) {
-                  const troufeu_nome = 'Comunicador'
-                  const troufeu_tipo = 'Prata'
-                    
-                    db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      const re = result.length;
-                      const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                     db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       const re = result.length
+//                       const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado;          
+                  
+//                       if (trofeu === 0 && re === 1) {
+//                         db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                           res.status(200).json({
+//                             troufeu_nome: troufeu_nome,
+//                             troufeu_tipo: troufeu_tipo
+//                           })
+//                         })
+//                     } else if (trofeu === 0 && re === 0)  { 
+//                       db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                         if (err) throw err;
+//                         db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                           res.status(200).json({
+//                             troufeu_nome: troufeu_nome,
+//                             troufeu_tipo: troufeu_tipo
+//                           })
+//                         })
+//                       })
+//                     } 
+//                     })
                 
-                      if (trofeu === 0 && re === 1) {
-                        db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                          res.status(200).json({
-                            troufeu_nome: troufeu_nome,
-                            troufeu_tipo: troufeu_tipo
-                          })
-                        })
-                    } else if (trofeu === 0 && re === 0)  { 
-                      db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                        if (err) throw err;
-                        db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                          res.status(200).json({
-                            troufeu_nome: troufeu_nome,
-                            troufeu_tipo: troufeu_tipo
-                          })
-                        })
-                      })
-                    }
-                    })
-                }
-                else if (pergunta_length === 5) {
-                  const troufeu_nome = 'Tagarela'
-                  const troufeu_tipo = 'Ouro'
+//                 } else if (pergunta_length === 3) {
+                  // const troufeu_nome = 'Comunicador'
+                  // const troufeu_tipo = 'Prata'
                     
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado;  
+//                     db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       const re = result.length;
+//                       const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+                
+//                       if (trofeu === 0 && re === 1) {
+//                         db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                           res.status(200).json({
+//                             troufeu_nome: troufeu_nome,
+//                             troufeu_tipo: troufeu_tipo
+//                           })
+//                         })
+//                     } else if (trofeu === 0 && re === 0)  { 
+//                       db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                         if (err) throw err;
+//                         db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                           res.status(200).json({
+//                             troufeu_nome: troufeu_nome,
+//                             troufeu_tipo: troufeu_tipo
+//                           })
+//                         })
+//                       })
+//                     }
+//                     })
+//                 }
+//                 else if (pergunta_length === 5) {
+                  // const troufeu_nome = 'Tagarela'
+                  // const troufeu_tipo = 'Ouro'
+                    
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado;  
                              
                       
-                    if (trofeu === 0 && re === 1) {
-                        db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                          res.status(200).json({
-                            troufeu_nome: troufeu_nome,
-                            troufeu_tipo: troufeu_tipo
-                          }) 
-                        })
-                    } else if (trofeu === 0 && re === 0)  { 
-                      db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                        if (err) throw err;
-                        db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                          res.status(200).json({
-                            troufeu_nome: troufeu_nome, 
-                            troufeu_tipo: troufeu_tipo
-                          })
-                        })
-                      })
-                    }
-                  })
-                }
-                  } 
-              } else if (resposta_length >= 1 || resposta_length === 3 || resposta_length === 5) {
-                console.log('resposta');
-                if (resposta_length === 1 ) {
-                  const troufeu_nome = 'Ajudante'
-                  const troufeu_tipo = 'Bronze'
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                     if (trofeu === 0 && re === 1) {
+//                         db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                           res.status(200).json({
+//                             troufeu_nome: troufeu_nome,
+//                             troufeu_tipo: troufeu_tipo
+//                           }) 
+//                         })
+//                     } else if (trofeu === 0 && re === 0)  { 
+//                       db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                         if (err) throw err;
+//                         db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                           res.status(200).json({
+//                             troufeu_nome: troufeu_nome, 
+//                             troufeu_tipo: troufeu_tipo
+//                           })
+//                         })
+//                       })
+//                     }
+//                   })
+//                 }
+//                   } 
+//               } else if (resposta_length >= 1 || resposta_length === 3 || resposta_length === 5) { 777
+//                 console.log('resposta');
+//                 if (resposta_length === 1 ) {
+                  // const troufeu_nome = 'Ajudante'
+                  // const troufeu_tipo = 'Bronze'
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
                 
                 
-                    if (trofeu === 0 && re === 1) {
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                  } else if (trofeu === 0 && re === 0)  { 
-                    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                    })
-                  }
-                  })
-                } else if (resposta_length === 3) {
-                  const troufeu_nome = 'Networking'
-                  const troufeu_tipo = 'Prata'
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                     if (trofeu === 0 && re === 1) {
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                   } else if (trofeu === 0 && re === 0)  { 
+//                     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                     })
+//                   }
+//                   })
+//                 } else if (resposta_length === 3) { 777
+                  // const troufeu_nome = 'Networking'
+                  // const troufeu_tipo = 'Prata'
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
                 
                 
-                    if (trofeu === 0 && re === 1) {
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                  } else if (trofeu === 0 && re === 0)  { 
-                    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                    })
-                  }
-                  })
-                } else if ( resposta_length === 5) {
-                  const troufeu_nome = 'Mentor'
-                  const troufeu_tipo = 'Ouro'
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                     if (trofeu === 0 && re === 1) {
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                   } else if (trofeu === 0 && re === 0)  { 
+//                     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                     })
+//                   }
+//                   })
+//                 } else if ( resposta_length === 5) {
+                  // const troufeu_nome = 'Mentor'
+                  // const troufeu_tipo = 'Ouro'
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
                 
                 
-                    if (trofeu === 0 && re === 1) {
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                  } else if (trofeu === 0 && re === 0)  { 
-                    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                    })
-                  }
-                  }) 
-                }
+//                     if (trofeu === 0 && re === 1) {
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                   } else if (trofeu === 0 && re === 0)  { 
+//                     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                     })
+//                   }
+//                   }) 
+//                 }
                 
-              } else if ( likes_length >= 1  || likes_length === 3 || likes_length === 5)  {
-                console.log('likes');
+//               } else if ( likes_length >= 1  || likes_length === 3 || likes_length === 5)  {
+//                 console.log('likes');
                 
                 
-                if (likes_length === 1) {
-                  const troufeu_nome = 'Timido'
-                  const troufeu_tipo = 'Bronze'
+//                 if (likes_length === 1) {
+//                   const troufeu_nome = 'Timido'
+//                   const troufeu_tipo = 'Bronze'
                   
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length;
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length;
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
                 
                 
-                    if (trofeu === 0 && re === 1) {
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                        return;
-                      })
-                  } else if (trofeu === 0 && re === 0)  { 
-                    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                    })
-                  }
-                  })
-                } else if (likes_length === 3) {
-                  const troufeu_nome = 'Interativo'
-                  const troufeu_tipo = 'Prata'
-                  console.log('confia');
+//                     if (trofeu === 0 && re === 1) {
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                         return;
+//                       })
+//                   } else if (trofeu === 0 && re === 0)  { 
+//                     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                     })
+//                   }
+//                   })
+//                 } else if (likes_length === 3) {
+//                   const troufeu_nome = 'Interativo'
+//                   const troufeu_tipo = 'Prata'
+//                   console.log('confia');
 
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
                 
                 
-                    if (trofeu === 0 && re === 1) {
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                  } else if (trofeu === 0 && re === 0)  { 
-                    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                    })
-                  }
-                  }) 
-                } else if ( likes_length === 5) {
-                  const troufeu_nome = 'Da comunidade';
-                  const troufeu_tipo = 'Ouro';
-                  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-                    if (err) throw err;
-                    const re = result.length;
-                    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//                     if (trofeu === 0 && re === 1) {
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                   } else if (trofeu === 0 && re === 0)  { 
+//                     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                     })
+//                   }
+//                   }) 
+//                 } else if ( likes_length === 5) {
+//                   const troufeu_nome = 'Da comunidade';
+//                   const troufeu_tipo = 'Ouro';
+//                   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//                     if (err) throw err;
+//                     const re = result.length;
+//                     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
                   
-                    if (trofeu === 0 && re === 1) {
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                  } else if (trofeu === 0 && re === 0)  { 
-                    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-                      if (err) throw err;
-                      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                        res.status(200).json({
-                          troufeu_nome: troufeu_nome,
-                          troufeu_tipo: troufeu_tipo
-                        })
-                      })
-                    })
-                  } else {
-                    res.status(400).send('hehe')
-                  }
-                  }) 
-                }
-              } else if (curso_length >= 1 || curso_length === 3 || curso_length === 5) {
-console.log('course');
+//                     if (trofeu === 0 && re === 1) {
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                   } else if (trofeu === 0 && re === 0)  { 
+//                     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//                       if (err) throw err;
+//                       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                         res.status(200).json({
+//                           troufeu_nome: troufeu_nome,
+//                           troufeu_tipo: troufeu_tipo
+//                         })
+//                       })
+//                     })
+//                   } else {
+//                     res.status(400).send('hehe')
+//                   }
+//                   }) 
+//                 }
+//               } else if (curso_length >= 1 || curso_length === 3 || curso_length === 5) {
+// console.log('course');
 
-if (curso_length === 1) {
-  const troufeu_nome = 'Visitante'
-  const troufeu_tipo = 'Bronze'  
-  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-    if (err) throw err;
-    const re = result.length;
-    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+// if (curso_length === 1) {
+//   const troufeu_nome = 'Visitante'
+//   const troufeu_tipo = 'Bronze'  
+//   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//     if (err) throw err;
+//     const re = result.length;
+//     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
 
-    if (trofeu === 0 && re === 1) {
-      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-        res.status(200).json({
-          troufeu_nome: troufeu_nome,
-          troufeu_tipo: troufeu_tipo
-        })
-      })
-  } else if (trofeu === 0 && re === 0)  { 
-    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-      if (err) throw err;
-      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-        res.status(200).json({
-          troufeu_nome: troufeu_nome,
-          troufeu_tipo: troufeu_tipo
-        })
-      })
-    })
-  }
-  })
-} else if (curso_length === 3) {
-  const troufeu_nome = 'De casa'
-  const troufeu_tipo = 'Prata'
-  db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-    if (err) throw err;
-    const re = result.length
-    const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//     if (trofeu === 0 && re === 1) {
+//       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//         res.status(200).json({
+//           troufeu_nome: troufeu_nome,
+//           troufeu_tipo: troufeu_tipo
+//         })
+//       })
+//   } else if (trofeu === 0 && re === 0)  { 
+//     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//       if (err) throw err;
+//       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//         res.status(200).json({
+//           troufeu_nome: troufeu_nome,
+//           troufeu_tipo: troufeu_tipo
+//         })
+//       })
+//     })
+//   }
+//   })
+// } else if (curso_length === 3) {
+//   const troufeu_nome = 'De casa'
+//   const troufeu_tipo = 'Prata'
+//   db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//     if (err) throw err;
+//     const re = result.length
+//     const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
 
 
-    if (trofeu === 0 && re === 1) {
-      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-        res.status(200).json({
-          troufeu_nome: troufeu_nome,
-          troufeu_tipo: troufeu_tipo
-        })
-      })
-  } else if (trofeu === 0 && re === 0)  { 
-    db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-      if (err) throw err;
-      db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-        res.status(200).json({
-          troufeu_nome: troufeu_nome,
-          troufeu_tipo: troufeu_tipo
-        })
-      })
-    })
-  }
-  })
-} else if ( curso_length === 5) {
-        const troufeu_nome = 'Astronauta'
-        const troufeu_tipo = 'Ouro'
-        db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
-          if (err) throw err;
-          const re = result.length
-          const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
+//     if (trofeu === 0 && re === 1) {
+//       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//         res.status(200).json({
+//           troufeu_nome: troufeu_nome,
+//           troufeu_tipo: troufeu_tipo
+//         })
+//       })
+//   } else if (trofeu === 0 && re === 0)  { 
+//     db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//       if (err) throw err;
+//       db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//         res.status(200).json({
+//           troufeu_nome: troufeu_nome,
+//           troufeu_tipo: troufeu_tipo
+//         })
+//       })
+//     })
+//   }
+//   })
+// } else if ( curso_length === 5) {
+//         const troufeu_nome = 'Astronauta'
+//         const troufeu_tipo = 'Ouro'
+//         db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
+//           if (err) throw err;
+//           const re = result.length
+//           const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
 
-                  if (trofeu === 0 && re === 1) {
-              db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                res.status(200).json({
-                  troufeu_nome: troufeu_nome,
-                  troufeu_tipo: troufeu_tipo
-                })
-              })
-          } else if (trofeu === 0 && re === 0)  { 
-            db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
-              if (err) throw err;
-              db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
-                res.status(200).json({
-                  troufeu_nome: troufeu_nome,
-                  troufeu_tipo: troufeu_tipo
-                }) 
-              })
-            })
-          }
-        }) 
-      } 
-              } else {
-              return res.status(400).send('no trophies')
-              }
+//                   if (trofeu === 0 && re === 1) {
+//               db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                 res.status(200).json({
+//                   troufeu_nome: troufeu_nome,
+//                   troufeu_tipo: troufeu_tipo
+//                 })
+//               })
+//           } else if (trofeu === 0 && re === 0)  { 
+//             db.query(sqlTrophy, [id, data, troufeu_nome,  troufeu_tipo, name], function (err: Error, result: any) {
+//               if (err) throw err;
+//               db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
+//                 res.status(200).json({
+//                   troufeu_nome: troufeu_nome,
+//                   troufeu_tipo: troufeu_tipo
+//                 }) 
+//               })
+//             })
+//           }
+//         }) 
+//       } 
+//     } 
         
           })      
         })    
@@ -515,8 +582,7 @@ if (curso_length === 1) {
     //       if (err) throw err;
     //       const re = result.length
     //       const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
-        
-          
+
 
 
     //       if (trofeu === 0 && re === 1) {
