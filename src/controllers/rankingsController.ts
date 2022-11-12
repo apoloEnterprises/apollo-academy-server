@@ -163,17 +163,14 @@ class rankingsController {
                 db.query(sqlSelectTrophy, [troufeu_nome_bronze_pergunta.troufeu_nome, name], function (err: Error, result: any) {
                   if (err) throw err;
                   const trofeu_bronze_pergunta_existe = result
-                  console.log(trofeu_bronze_pergunta_existe.length);
                   
                   db.query(sqlSelectTrophy, [troufeu_nome_prata_pergunta.troufeu_nome, name], function (err: Error, result: any) {
                     if (err) throw err;  
                     const trofeu_prata_pergunta_existe = result
-                    console.log(trofeu_prata_pergunta_existe.length);
                     
                     db.query(sqlSelectTrophy, [troufeu_nome_ouro_pergunta.troufeu_nome, name], function (err: Error, result: any) {
                       if (err) throw err;
                       const trofeu_ouro_pergunta_existe = result
-                      console.log(trofeu_ouro_pergunta_existe.length);
                       
                       db.query(sqlSelectTrophy, [troufeu_nome_bronze_resposta.troufeu_nome, name], function (err: Error, result: any) {
                         if (err) throw err;
@@ -302,7 +299,8 @@ class rankingsController {
                                           })
                                         }
                                           
-                                        }  else if (trofeu_bronze_resposta_existe.length === 0 && resposta_length === 1 || trofeu_prata_resposta_existe.length === 0 && resposta_length === 3 || trofeu_ouro_resposta_existe.length === 0 && resposta_length === 5) {
+                                        }  else if (trofeu_bronze_resposta_existe.length === 0 && resposta_length === 1 || trofeu_prata_resposta_existe.length 
+                                          === 0 && resposta_length === 3 || trofeu_ouro_resposta_existe.length === 0 && resposta_length === 5) {
                                                                                 
                                           if (resposta_length === 1 ) {
                                             const troufeu_nome = 'Ajudante'
@@ -311,7 +309,6 @@ class rankingsController {
                                               if (err) throw err;
                                               const re = result.length
                                               const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
-                                          
                                           
                                               if (trofeu === 0 && re === 1) {
                                                 db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
@@ -339,7 +336,7 @@ class rankingsController {
                                               if (err) throw err;
                                               const re = result.length
                                               const trofeu = result[0]?.conquistado === undefined ? 0 : result[0].conquistado
-                                          
+
                                           
                                               if (trofeu === 0 && re === 1) {
                                                 db.query(sqlUpdate, [troufeu_nome], function (err: Error, result: any) {
@@ -395,7 +392,7 @@ class rankingsController {
                                           if (likes_length === 1) {
                                             const troufeu_nome = 'Timido'
                                             const troufeu_tipo = 'Bronze'
-                                            
+                                              
                                             db.query(sqlSelectTrophy, [troufeu_nome, name], function (err: Error, result: any) {
                                               if (err) throw err;
                                               const re = result.length;
@@ -570,26 +567,24 @@ class rankingsController {
                                                 } 
                                         } else {
                                           res.status(400).send('no new trophy')
-                                        }
-
-                                      }) 
-                                    })
-                                  })
+                                      }
+                                  }) 
                                 })
                               })
-                            }) 
-                          })   
-                        })
-                      })
+                            })
+                          })
+                        }) 
+                      })   
                     })
                   })
-                })        
+                })
+              })
+            })        
           })      
         })    
       })
     })
-
-    }
+  }
  
     public async getTotalUserTrophies(req: Request, res: Response) {
       const {

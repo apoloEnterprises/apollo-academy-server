@@ -32,7 +32,7 @@ class userController {
     WHERE 
         nomeDeUsuario=?
     `;   
-            
+              
     if(categoria && nomeDeUsuario && subCategoria3 && subCategoria1 && subCategoria2) {
       db.query(`SELECT * FROM usuarios where nomeDeUsuario=?`, [nomeDeUsuario], function (err: Error): void {
         if (err) throw err;
@@ -100,8 +100,6 @@ class userController {
       nomeDeUsuario,
       senha
     } = req.body;
-    console.log(nomeDeUsuario);
-    console.log(senha);
     
  
     interface ResultQuey {
@@ -123,28 +121,31 @@ class userController {
 
     if(!nomeDeUsuario) {
       res.status(404).send('Email or username not found.');
+      return;
     }
 
     db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
-      if(err) throw err;
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+    }
+
       const ResultUsername = result[0]?.nomeDeUsuario;
       const ResultPassword = result[0]?.senha;
       const resultid = result[0]?.id;
-      console.log(ResultPassword);
-      console.log(senhauuid);
-      console.log(ResultUsername);
-      
-      
 
       if(nomeDeUsuario === ResultUsername && senhauuid === ResultPassword) {
         res.status(200).send({
           status: nomeDeUsuario,
           id: resultid
         }) 
+        return;
       } else {
         res.status(400).send({
           status: 'Username or password is not valid.'
         })
+        return;
       }
     });
    }
@@ -264,7 +265,7 @@ class userController {
     } = req.body;
 
     if(!id_user) {
-      res.status(404).send('no id provided.')
+      return res.status(404).send('no id provided.');
     }
 
     const sql: typeof sqlType = `
@@ -275,9 +276,8 @@ class userController {
 
     db.query(sql, [name, id_user], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
       if (err) throw err;
-      res.status(200).send(result)
+      return res.status(200).send(result);
      })
-
    }
 
    public async insertFullname(req: Request, res: Response) {
@@ -292,7 +292,6 @@ class userController {
 
     const id = uuidv4();
 
-
     const sql: typeof sqlType = `
     INSERT INTO usuario_nomeCompleto (id, id_usuario, nome_completo)
     VALUES (?, ?, ?)
@@ -300,7 +299,7 @@ class userController {
 
     db.query(sql, [id, id_usuario, nome_completo], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
       if (err) throw err;
-      res.status(200).send(result)
+      return res.status(200).send(result)
      })
    }
 
@@ -321,7 +320,6 @@ class userController {
 
     db.query(sql, [id_usuario], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
       if (err) throw err;
-      console.log(result);
       
       if (result.length >= 1) {
         res.status(200).send(result)

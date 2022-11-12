@@ -21,8 +21,8 @@ router.post('/get-fullname-config', userController.getConfigFullname);
 router.post('/`get-slide-visto`', userController.findVistoSlide);
 router.post('/insert-slide-visto', userController.insertSlideVisto);
 // --------------------**********------------------------
-   
-// --------------------community routes-------------------------
+    
+// -------- ------------community routes-------------------------
 router.post('/community/create-post', communityController.postIndex);
 router.get('/community/post/:id', communityController.getUserPosts);
 router.get('/community/posts/:categoria/:subCategoria', communityController.getPostByCategory);
@@ -45,8 +45,8 @@ router.get('/community/post-answer/:id', communityController.getPostAndAnswers);
 router.get('/question-trophy/:name/:id_user', rankingsController.trophy);
 router.get('/total-user-trophies/:nome', rankingsController.getTotalUserTrophies); 
 router.get('/list-user-each-trophy/:nome', rankingsController.getUserEachTrophyNumber);
-
 // --------------------**********------------------------
+      
  
 // --------------------courses-------------------------  
 router.post('/watching', coursesController.verifyWatched); 

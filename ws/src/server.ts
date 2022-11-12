@@ -38,29 +38,49 @@ ws.on('connection', (ws: WebSocket) => {
       SET timestamp=?
       WHERE id_usuario=?
       `  
+
+      const sqlSelectCheck: string = `
+      SELECT * FROM usuario_curso_assistindo
+      WHERE id_usuario=?
+      `  
+
+      const sqlSelectinsert: string = ` 
+      INSERT
+      INTO usuario_curso_assistindo (id_usuario, id_curso, aula_assistindo, timestamp, total_timestamp)
+      VALUES (?, ?, ?, ?, ?)
+      `  
+
+      const id = uuidv4()
+
+      const id_curso = '4e8e3f21-bc19-4319-87ff-dfd580d8a8db';
+
+      const aula_assistindo = 'O que o Javascript é capaz de fazer?'
         
-      console.log('received: %s', message); 
-     
-        if (message.includes(':')) {
-          db2.query(sqlSelecttest, [message, id_usuario], async function (err: Error, result: any) {
-            if (err) throw err;
-            console.log('timestamp');
-          })  
-        }   
+      // console.log('received: %s', JSON.parse(message));
       
-        
-        console.log('received: %s', message); 
+      // const userWatch = JSON.parse(message);         
+
+        // if (userWatch.usertime.includes(':')) {
+        //   console.log(userWatch.id_usuario);
+           
+
+        //     db2.query(sqlSelecttest, [userWatch.usertime, userWatch.id_usuario], async function (err: Error, result: any) {
+        //     if (err) throw err;
+        //     console.log(userWatch.usertime);
+            
+        //     })
+        // }    
         
         const sqlnome: string = `
         SELECT nomeDeUsuario
         FROM usuarios
         WHERE nomeDeUsuario=?
         `
-        
+          
       
         db2.query(sqlnome, [message], async function (err: Error, result: any) {
           if (err) throw err;
-          if (result.length > 0) {
+          if (result.length >= 1) {
             // ws.send([true])
             console.log('ja em uso');
             ws.send('em uso')            
@@ -68,12 +88,7 @@ ws.on('connection', (ws: WebSocket) => {
             ws.send('disponivel')
           }
         })
-      });
-      
-
-
-      
-
+      }); 
   });
 
 //start our server

@@ -9,18 +9,9 @@ const {
 class coursesController {
  public async verifyWatched(req: Request, res: Response) {
 
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
     const {
       id_usuario
-      } = await req.body;
-
-      if(!id_usuario) {
-        res.status(404).send({
-          message: 'Error: ID not provided.'
-        })
-      }
+      } = req.body;
 
       const sqlWatched: typeof sqlType = `
       SELECT *
@@ -31,28 +22,44 @@ class coursesController {
       const sqlWatched2: typeof sqlType = `
       SELECT *
       FROM usuario_curso_assistindo
-      LEFT JOIN curso
-      ON usuario_curso_assistindo.id_curso = curso.id
+      WHERE id_curso AND id_usuario=?
       `
-      
-      db.query(sqlWatched, [id_usuario], async function (err: Error, result: typeof ResultQueryWatched[]) {
-        if (err) throw err;
-        // const result_user_course = result
-        // const id_curso = result[0]?.id_curso;
-        if(result.length <= 0) {
-          res.status(200).send({
-            watching: false 
-          });
-        } else {
-          db.query(sqlWatched2, [id_usuario], function (err: Error, result: typeof ResultQueryWatched[]) {
-          res.status(200).json({
-            watching: true,
-            curso: result
-          }) 
-          })
-        }
-      });
-}
+    
+      if(!id_usuario) {
+        return res.status(404).send({
+          message: 'Error: ID not provided.'
+        })
+      } 
+
+        db.query(sqlWatched, [id_usuario], async function (err: Error, result: typeof ResultQueryWatched[]) {
+          if (err) {
+            console.log(err);
+            return res.sendStatus(500);
+            }         
+          // const result_user_course = result
+          const id_curso = result[0]?.id_curso;
+          console.log(result); 
+ 
+          if(result.length === 0) {
+            return res.json({ 
+              watching: false 
+            })
+          } else if (result.length === 1) {
+            db.query(sqlWatched, [id_usuario], function (err: Error, result: typeof ResultQueryWatched[]) {
+              if (err) {
+                console.log(err);
+                return res.sendStatus(500);
+              }
+              console.log(result)
+              return res.json({ 
+              watching: true,
+              curso: result 
+            }) 
+            }) 
+          } 
+        });
+    
+} 
 
 public async insertCourse(req: Request, res: Response) {
 
@@ -73,7 +80,7 @@ public async insertCourse(req: Request, res: Response) {
       const id_category = uuidv4();
 
       if(!nome) {
-        res.status(404).send({
+        return res.status(404).send({
           message: 'Error: No course provided.'
         })
       }
@@ -93,15 +100,11 @@ public async insertCourse(req: Request, res: Response) {
       db.query(sqlWatched, [id, nome, descricao, foto_capa, autor], async function (err: Error, result: typeof ResultQueryInsertCourse[]) {
         if (err) throw err;
         const [course] = result
-        console.log(course);
         
           db.query(sqlCategory, [nome, categoria, sub_categoria, item], function (err: Error, result: typeof ResultQueryInsertCourse[]) {
           if (err) throw err;
           
-          res.status(200).send('Course Created Successfully.')
- 
-          
-          // db.query(sqlSelect, )
+          return res.status(200).send('Course Created Successfully.') 
         })
     })
 }
@@ -112,7 +115,7 @@ public async getCourseAndCategory(req: Request, res: Response) {
   } = req.body
 
   if (!id) {
-    res.status(404).send('ID not found.')
+    return res.status(404).send('ID not found.')
   }
   
   const sqlSelect: typeof sqlType = `
@@ -125,7 +128,7 @@ public async getCourseAndCategory(req: Request, res: Response) {
   db.query(sqlSelect, [id], async function (err: Error, result: typeof ResultQueryInsertCourse[]) {
     if (err) throw err;
 
-    res.send(result[0])
+    return res.send(result[0])
     
   })
 
@@ -145,7 +148,7 @@ public async insertWatching(req: Request, res: Response) {
       } = await req.body;
 
       if(!id_usuario) {
-        res.status(404).send({
+        return res.status(404).send({
           message: 'Error: No ID provided.'
         })
       }
@@ -158,7 +161,7 @@ public async insertWatching(req: Request, res: Response) {
         
       db.query(sqlWatched, [id_usuario, id_curso, aula_assistindo, timestamp, total_timestamp], async function (err: Error, result: typeof ResultQueryInsertWacting[]) {
         if (err) throw err;
-        res.status(200).json(result);
+        return res.status(200).json(result);
       })
 }
 
@@ -171,7 +174,7 @@ public async insertWatching(req: Request, res: Response) {
 
 
       if (!categoria || !sub_categoria) {
-        res.status(404).send('Categories not found.');
+        return res.status(404).send('Categories not found.');
       }
 
       const sql: typeof sqlType = `
@@ -181,7 +184,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sql, [categoria, sub_categoria, item], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
         if (err) throw err;
-        res.send(result)
+        return res.send(result)
       })
      }
 
@@ -191,7 +194,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.params
       
       if (!sub_categoria) {
-        res.status(404).send('Category not found.')
+        return res.status(404).send('Category not found.')
       }
 
       const sql: typeof sqlType = `
@@ -202,7 +205,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sql, [sub_categoria], async function (err: Error, result: any) {
         if(err) throw err;
-        res.send(result)
+        return res.send(result)
       })
 
      }
@@ -219,7 +222,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body
 
       if ( !id_curso || !id_modulo || !aula_nome || !video) {
-        res.status(404).send('Required data not found.')
+        return res.status(404).send('Required data not found.')
       }
       
       const sql: typeof sqlType = `
@@ -231,7 +234,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sql, [id, id_curso, id_modulo, aula_nome, video], async function (err: Error, result: any) {
         if(err) throw err;
-        res.send(result)
+        return res.send(result)
       })
      } 
 
@@ -244,7 +247,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body
 
       if ( !id_curso || !nome_modulo || !modulo_ordem) {
-        res.status(404).send('Required data not found.')
+        return res.status(404).send('Required data not found.')
       }
 
       const id = uuidv4();
@@ -256,7 +259,7 @@ public async insertWatching(req: Request, res: Response) {
   
       db.query(sql, [id, id_curso, nome_modulo, modulo_ordem], async function (err: Error, result: any) {
         if(err) throw err;
-        res.send(result)
+        return res.send(result)
       })
 
      }
@@ -264,15 +267,15 @@ public async insertWatching(req: Request, res: Response) {
      public async getModules (req: Request, res: Response) {
 
 
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+       res.header("Access-Control-Allow-Origin", "*");
+       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
      
       const {
         id_curso
       } = req.body; 
 
       if (!id_curso) {
-        res.status(404).send('No ID provided.')
+        return res.status(404).send('No ID provided.')
       }
    
       const sqlSelecttest: typeof sqlType = `
@@ -285,7 +288,7 @@ public async insertWatching(req: Request, res: Response) {
       db.query(sqlSelecttest, [id_curso], async function (err: Error, result: typeof ResultQueryCourseModules[]) {
         if (err) throw err;
        
-        res.json({
+        return res.json({
           modulo: result
         })
       })
@@ -298,7 +301,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body;
 
       if (!id_modulo) {
-        res.status(404).send('No ID provided.')
+        return res.status(404).send('No ID provided.')
       }
 
       const sqlSelecttest: typeof sqlType = `
@@ -310,7 +313,7 @@ public async insertWatching(req: Request, res: Response) {
       db.query(sqlSelecttest, [id_modulo], async function (err: Error, result: typeof ResultQueryCourseModules[]) {
         if (err) throw err;
        
-        res.json({
+        return res.json({
           aulas: result
         })
       })
@@ -325,9 +328,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body
 
       if (!id_curso || !id_aluno || !nota) {
-        res.status(404).json({
-          message: 'Needed data not found.'
-        })
+        res.status(404).json({message: 'Needed data not found.'});
       }
 
       const id = uuidv4();
@@ -340,42 +341,66 @@ public async insertWatching(req: Request, res: Response) {
       db.query(sqlSelecttest, [id, id_curso, id_aluno, nota], async function (err: Error, result: any) {
         if (err) throw err;
         const re = await result
-        res.send(re)
+        return res.send(re)
       })
 
      }
-
-     public async inscreverCursoAluno(req: Request, res: Response): Promise<void> {
+ 
+     public async inscreverCursoAluno(req: Request, res: Response) {
       const {
         nome_curso,
         id_aluno,
       } = req.body
 
       if (!nome_curso || !id_aluno) {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'Needed data not found.'
-        })
-      } 
-
+        }) 
+      }  
+  
       const id = uuidv4();
 
       const sqlInsertInto: typeof sqlType = `
       INSERT INTO curso_alunos (id, nome_curso, id_aluno)
       VALUES (?,?,?)  
-      `  
- 
+      `    
+  
       const sqlSelect: typeof sqlType = `
       SELECT *
       FROM curso
-      WHERE id=?
+      WHERE nome=?
       `
+
+      const sqlSelectinsert: string = ` 
+      INSERT
+      INTO usuario_curso_assistindo (id_usuario, id_curso, aula_assistindo, timestamp, total_timestamp)
+      VALUES (?, ?, ?, ?, ?)
+      `  
+
+      const aula_assistindo = 'O que o Javascript é capaz de fazer?'
   
       db.query(sqlInsertInto, [id, nome_curso, id_aluno], async function (err: Error, result: any) {
-        if (err) throw err;
+        if (err) {
+          console.log(err);
+          return res.sendStatus(500);
+      }
+
         db.query(sqlSelect, [nome_curso], async function (err: Error, result: any) {
-          if (err) throw err;
-          const re = await result
-          res.send(re)
+          if (err) {
+            console.log(err);
+            return res.sendStatus(500);
+        }
+
+          const curso_id = result[0].id;
+          
+          db.query(sqlSelectinsert, [id_aluno, curso_id, aula_assistindo, '00:00', '28:49' ], async function (err: Error, result: any) {
+            if (err) {
+              console.log(err);
+              return res.sendStatus(500);
+              
+          }
+            return res.end() 
+            })
         })
       })
 
@@ -387,7 +412,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.params
 
       if(!id) {
-        res.status(404).send('No id provided.')
+        return res.status(404).send('No id provided.')
       }
 
       const sqlSelect: typeof sqlType = `
@@ -405,7 +430,7 @@ public async insertWatching(req: Request, res: Response) {
       db.query(sqlSelect, [id], async function (err: Error, result: any) {
         if (err) throw err;
         // console.log(result);
-        res.send(result)
+        return res.send(result)
       })
     }
  
@@ -416,7 +441,7 @@ public async insertWatching(req: Request, res: Response) {
 
 
       if (!id_curso) {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'Needed data not found.'
         })
       }
@@ -430,7 +455,7 @@ public async insertWatching(req: Request, res: Response) {
       db.query(sqlSelect, [id_curso], async function (err: Error, result: any) {
         if (err) throw err;
         const nota = result
-        res.status(200).json({
+        return res.status(200).json({
           notas: nota,
           qnt_notas: nota.length
         })
@@ -444,7 +469,7 @@ public async insertWatching(req: Request, res: Response) {
 
 
       if (!id_aluno) {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'Needed data not found.'
         })
       }
@@ -461,7 +486,7 @@ public async insertWatching(req: Request, res: Response) {
       db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
         if (err) throw err;
         const aluno = result
-        res.status(200).json({
+        return res.status(200).json({
           alunos: aluno,
           qnt_alunos: aluno.length
         })
@@ -508,7 +533,7 @@ public async insertWatching(req: Request, res: Response) {
         db.query(sqlMatchCategories, [subCategory_1_User, subCategory_2_User, SubCategory_3_User], async function (err: Error, result: typeof ResultQueryInsertCategory[]) {
           db.query(sqlSelect, [subCategory_1_User], async function (err: Error, result: any) {
             if (err) throw err;
-            res.status(200).json({
+            return res.status(200).json({
               re: result
             }) 
           })
@@ -524,7 +549,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body
 
       if (!id_aluno || !nome_curso) {
-        res.status(404).send('No data provided')
+        return res.status(404).send('No data provided')
       }
 
       const id = uuidv4();
@@ -537,7 +562,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sqlInsertInto, [id, nome_curso, id_aluno], async function (err: Error, result: any) {
         if (err) throw err;
-        res.status(200).json({
+        return res.status(200).json({
           re: result
         })
      })
@@ -551,7 +576,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body
 
       if (!id_aluno || !nome_curso) {
-        res.status(404).send('No data provided')
+        return res.status(404).send('No data provided')
       }
 
       const id = uuidv4();
@@ -564,7 +589,7 @@ public async insertWatching(req: Request, res: Response) {
       
       db.query(sqlInsertInto, [id, id_aluno, nome_curso], async function (err: Error, result: any) {
         if (err) throw err;
-        res.status(200).json({
+        return res.status(200).json({
           re: result
         })
      })
@@ -576,7 +601,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.params;
 
       if (!id_aluno) {
-        res.status(404).send('No data provided')
+        return res.status(404).send('No data provided')
       }
 
 
@@ -588,7 +613,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
         if (err) throw err;
-        res.status(200).send(result);
+        return res.status(200).send(result);
      })
 
     }
@@ -599,7 +624,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.params;
 
       if (!id_aluno) {
-        res.status(404).send('No data provided')
+        return res.status(404).send('No data provided')
       }
 
 
@@ -611,7 +636,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
         if (err) throw err;
-        res.status(200).send(result);
+        return res.status(200).send(result);
      })
 
     }
@@ -623,21 +648,21 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body;
 
       if (!id_curso || !id_usuario) {
-        res.status(404).send('No data provided.')
+        return res.status(404).send('No data provided.')
       }
  
       const sqlSelect: typeof sqlType = `
       SELECT timestamp
       FROM usuario_curso_assistindo
       WHERE (id_curso=? AND id_usuario=?)
-      `
-
+      ` 
+      
       db.query(sqlSelect, [id_curso, id_usuario], async function (err: Error, result: any) {
         if (err) throw err;
-        res.status(200).send(result);
+        return res.status(200).send(result);
      }) 
     }
-
+ 
     public async getliked(req: Request, res: Response) {
       const {
         id_aluno,
@@ -645,7 +670,7 @@ public async insertWatching(req: Request, res: Response) {
       } = req.body;
 
       if (!nome_curso || !id_aluno) {
-        res.status(404).send('No data provided.')
+        return res.status(404).send('No data provided.')
       } 
      
       const sqlSelect: typeof sqlType = `
@@ -656,7 +681,7 @@ public async insertWatching(req: Request, res: Response) {
 
       db.query(sqlSelect, [nome_curso, id_aluno], async function (err: Error, result: any) {
         if (err) throw err;
-        res.status(200).send(result);
+        return res.status(200).send(result);
      }) 
       
     }
