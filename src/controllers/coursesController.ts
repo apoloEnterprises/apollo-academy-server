@@ -54,7 +54,7 @@ class coursesController {
               return res.json({ 
               watching: true,
               curso: result 
-            }) 
+            })  
             }) 
           } 
         });

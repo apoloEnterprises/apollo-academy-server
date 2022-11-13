@@ -377,13 +377,14 @@ class communityController {
  
         if(!resposta_id || !autor_like) {
           res.status(404).send('Data not found.')
-        }; 
+        }
       
         const id = uuidv4();
    
         const data = nowDate;
 
-        const sql: typeof sqlType = `INSERT INTO respostas_likes 
+        const sql: typeof sqlType = `
+        INSERT INTO respostas_likes 
         (id, data, resposta_id, autor_like) VALUES (?,?,?,?)`
  
 

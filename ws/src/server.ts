@@ -49,7 +49,7 @@ ws.on('connection', (ws: WebSocket) => {
       INTO usuario_curso_assistindo (id_usuario, id_curso, aula_assistindo, timestamp, total_timestamp)
       VALUES (?, ?, ?, ?, ?)
       `  
-
+  
       const id = uuidv4()
 
       const id_curso = '4e8e3f21-bc19-4319-87ff-dfd580d8a8db';
@@ -60,34 +60,46 @@ ws.on('connection', (ws: WebSocket) => {
       
       // const userWatch = JSON.parse(message);         
 
-        // if (userWatch.usertime.includes(':')) {
-        //   console.log(userWatch.id_usuario);
+      //   if (userWatch.usertime.includes(':')) {
+      //     console.log(userWatch.id_usuario);
            
 
-        //     db2.query(sqlSelecttest, [userWatch.usertime, userWatch.id_usuario], async function (err: Error, result: any) {
-        //     if (err) throw err;
-        //     console.log(userWatch.usertime);
+      //       db2.query(sqlSelecttest, [userWatch.usertime, userWatch.id_usuario], async function (err: Error, result: any) {
+      //       if (err) throw err;
+      //       console.log(userWatch.usertime);
             
-        //     })
-        // }    
+      //       })
+      //   }    
         
         const sqlnome: string = `
         SELECT nomeDeUsuario
         FROM usuarios
         WHERE nomeDeUsuario=?
-        `
+        `         
+
+        if (message.length >= 1 && message.length <= 50) {
+          console.log(message.length);
           
-      
-        db2.query(sqlnome, [message], async function (err: Error, result: any) {
-          if (err) throw err;
-          if (result.length >= 1) {
-            // ws.send([true])
-            console.log('ja em uso');
-            ws.send('em uso')            
+            db2.query(sqlnome, [message], async function (err: Error, result: any) {
+              if (err) throw err;
+              if (result.length >= 1) {
+                // ws.send([true])
+                console.log('ja em uso');
+                ws.send('em uso')            
+              } else {
+                ws.send('disponivel')
+              }
+            })
           } else {
-            ws.send('disponivel')
+            const userWatch = JSON.parse(message);        
+                        
+            
+            db2.query(sqlSelecttest, [userWatch.usertime, userWatch.id_usuario], async function (err: Error, result: any) {
+            if (err) throw err;
+
+            console.log(userWatch.usertime);
+              })
           }
-        })
       }); 
   });
 

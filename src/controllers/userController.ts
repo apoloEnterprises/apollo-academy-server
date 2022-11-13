@@ -8,7 +8,7 @@ const sqlType = require('./types/sqlTyped');
 const {
   ResultQueyUser,ResultQueyPost} = require('./types/resultTyped');
 const {  ResultQueryInsertCategory } = require('./types/shortResultTyped');
-const sha256 = require('sha256');
+const sha256 = require('sha256')
  
 // user first actions - login, sign up, first choice of cateogries etc..
    
@@ -378,7 +378,7 @@ class userController {
     } = req.body;
 
     if (!id_usuario) {
-      res.status(404).send('No id provided.')
+      return res.status(404).send('No id provided.')
     }
 
     const sqlSelect: typeof sqlType = `
@@ -391,20 +391,20 @@ class userController {
       if (err) throw err;
       // const mostrar = result;
       if (result.length >= 1) {
-        const mostrar = result[0].mostrar;
+        const mostrar = result[0]?.mostrar;
         console.log(mostrar);
         
         if (mostrar == 1) {
-          res.status(200).json({
+          return res.status(200).json({
             mostrar: true
           })
         } else if (mostrar == 0) {
-          res.status(200).json({
+          return res.status(200).json({
             mostrar: false
           })
         }
       } else {
-        res.status(200).json({
+        return res.status(200).json({
           mostrar: false
         })
       }
@@ -464,6 +464,12 @@ class userController {
         re: result
       })
    })
+  }
+
+  public async getNotfications (red: Request, res: Response) {
+    // const {
+
+    // }
   }
 }
 

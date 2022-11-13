@@ -25,6 +25,35 @@ CREATE TABLE IF NOT EXISTS `usuario_nomeCompleto` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_usuario`) REFERENCES usuarios(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `notificacoes_resposta` (
+  `id` varchar(255) UNIQUE NOT NULL,
+  `id_usuario` varchar(120) UNIQUE NOT NULL,
+  `nome_autor_resposta` varchar(120) NOT NULL,
+  `respsota_Txt` int default 0,
+  `pergunta_id` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`id_usuario`) REFERENCES usuarios(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `notificacoes_comentario` (
+  `id` varchar(255) UNIQUE NOT NULL,
+  `id_usuario` varchar(120) UNIQUE NOT NULL,
+  `nome_autor_resposta` varchar(120) NOT NULL,
+  `respsota_Txt` int default 0,
+  `pergunta_id` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`id_usuario`) REFERENCES usuarios(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `notificacoes_likes` (
+  `id` varchar(255) UNIQUE NOT NULL,
+  `id_usuario` varchar(120) UNIQUE NOT NULL,
+  `nome_autor_like` varchar(120) NOT NULL,
+  `respsota_id` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`id_usuario`) REFERENCES usuarios(id) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
  
 CREATE TABLE IF NOT EXISTS `titulos` (
   `id` varchar(255) UNIQUE NOT NULL,

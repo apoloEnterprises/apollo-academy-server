@@ -3,8 +3,7 @@
     "workbench.colorTheme": "Omni",
     "workbench.editor.labelFormat": "short",
     "workbench.startupEditor": "newUntitledFile",
-    "workbench.editor.untitled.hint": "hidden",
-    
+    "workbench.editor.untitled.hint": "hidden", 
     "editor.wordWrap": "on",
     "editor.fontSize": 12,
     "editor.lineHeight": 20,

@@ -143,15 +143,10 @@ class rankingsController {
                 troufeu_tipo : 'Prata'
               };
       
-              
-
-
-              
-              
-              const check = pergunta_length === 1 || pergunta_length === 3 || pergunta_length === 5;
-              const chec2 = resposta_length >= 1 || resposta_length === 3 || resposta_length === 5;
-              const chec3 = likes_length >= 1  || likes_length === 3 || likes_length === 5
-              const chec4 = curso_length >= 1 || curso_length === 3 || curso_length === 5
+              // const check = pergunta_length === 1 || pergunta_length === 3 || pergunta_length === 5;
+              // const chec2 = resposta_length >= 1 || resposta_length === 3 || resposta_length === 5;
+              // const chec3 = likes_length >= 1  || likes_length === 3 || likes_length === 5
+              // const chec4 = curso_length >= 1 || curso_length === 3 || curso_length === 5
               // console.log('pergunta + ' + check);
               // console.log('resposta: ' + chec2);
               // console.log('like: ' + chec3);
