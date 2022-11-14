@@ -194,6 +194,7 @@ class communityController {
       const data = nowDate;
   
       const id = uuidv4();
+      const idNotification = uuidv4();
   
       const sql: typeof sqlType = `INSERT INTO respostas 
       (id, data, pergunta_ID, autor_resposta_name, resposta_Txt) VALUES (?,?,?, ?,?)
@@ -202,25 +203,43 @@ class communityController {
       const sqlGetNumberAnswers: typeof sqlType = `
       SELECT *
       FROM respostas
-      WHERE pergunta_ID=?`;
+      WHERE pergunta_ID=?`; 
   
-      // const sqlUpdate: typeof sqlType = `UPDATE perguntas
-      // SET 
-      //   qnt_respostas
-      // WHERE 
-      //   id=?`;
+      const sqlSelectPergunta: typeof sqlType = `
+      SELECT autor_name
+      FROM perguntas
+      WHERE id=?
+      `
 
-        db.query(sql, [id,  data, pergunta_ID, autor_resposta_name, resposta_Txt], function (err: Error, result: typeof ResultQueyResposta[]) {
+      const sqlInsertNotifications: typeof sqlType = `
+      INSERT INTO notificacoes
+      (id, usuario_da_notificacao, nome_autor_resposta, resposta_Txt, pergunta_id, resposta_id)
+      VALUES (?, ?, ?, ?, ?, ?)`
+   
+      db.query(sqlSelectPergunta, [pergunta_ID], 
+        async function (err: Error, result: typeof ResultQueyResposta[]) {
           if (err) throw err;
-          const queryResult = result[0];
-          db.query(sqlGetNumberAnswers, [pergunta_ID], 
-            async function (err: Error, result: typeof ResultQueyResposta[]) {
-              if (err) throw err;
-              const postCount = result.length;
-              const numero_respostas = `${postCount}`;
-              res.status(200).send(queryResult)
+          const autor_pergunta_name = result[0]?.autor_name;
+          db.query(sql, [id,  data, pergunta_ID, autor_resposta_name, resposta_Txt], function (err: Error, result: typeof ResultQueyResposta[]) {
+            if (err) throw err;
+            const queryResult = result[0];
+            db.query(sqlGetNumberAnswers, [pergunta_ID], 
+              async function (err: Error, result: typeof ResultQueyResposta[]) {
+                if (err) throw err;
+
+                if (autor_pergunta_name === autor_resposta_name) {
+                  return res.status(200).send(queryResult)
+                } else {
+                  db.query(sqlInsertNotifications, [idNotification, autor_pergunta_name, autor_resposta_name, resposta_Txt, pergunta_ID, id], 
+                    async function (err: Error, result: typeof ResultQueyResposta[]) {
+                      if (err) throw err;
+                      return res.status(200).send(queryResult)
+                })
+              }
+              
             })}  
-        ) 
+          ) 
+        })
       }
   
       public async getPostAndAnswers (req: Request, res: Response) {
@@ -286,17 +305,58 @@ class communityController {
         const id = uuidv4();
 
         const data = nowDate;
-
   
         const sql: typeof sqlType = `INSERT INTO comentarios 
         (id, resposta_ID, data, autor_ID, comentario_Txt) VALUES (?,?,?, ?, ?)`
 
-        db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          res.status(200).json({
-            comentario: JSON.stringify(result)
+        const sqlSelectResposta: typeof sqlType = `
+        SELECT pergunta_ID, autor_resposta_name
+        FROM respostas
+        WHERE id=?
+        `
+
+        
+        const sqlSelectUser: typeof sqlType = `
+        SELECT nomeDeUsuario
+        FROM usuarios
+        WHERE nomeDeUsuario=?
+        `
+        const sqlInsertNotifications: typeof sqlType = `
+        INSERT INTO notificacoes
+        (id, usuario_da_notificacao, nome_autor_comentario, 
+          comentario_Txt, pergunta_id)
+        VALUES (?, ?, ?, ?, ?)
+        ` 
+
+
+
+          db.query(sqlSelectResposta, [resposta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+            if (err) throw err;
+            const pergunta_id = result[0]?.pergunta_ID;
+            const autor_resposta_name = result[0]?.autor_resposta_name;
+
+            if (autor_resposta_name === autor_ID) {
+              db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function
+                (err: Error, result: typeof ResultQueyComment[]) {
+                if (err) throw err;
+                return res.status(200).json({
+                  comentario: JSON.stringify(result)
+                })
+              })
+            } else {
+              db.query(sqlInsertNotifications, [id, autor_resposta_name, autor_ID, comentario_Txt, pergunta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+                if (err) throw err;
+  
+                db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function
+                  (err: Error, result: typeof ResultQueyComment[]) {
+                  if (err) throw err;
+                  return res.status(200).json({
+                    comentario: JSON.stringify(result)
+                  })
+                })
+              })
+            }
           })
-        })
       }
 
       public async getCommentAnswer(req: Request, res: Response) {
@@ -386,14 +446,47 @@ class communityController {
         const sql: typeof sqlType = `
         INSERT INTO respostas_likes 
         (id, data, resposta_id, autor_like) VALUES (?,?,?,?)`
+
+        const sqlSelectResposta: typeof sqlType = `
+        SELECT pergunta_ID, autor_resposta_name
+        FROM respostas
+        WHERE id=?
+        `
+
+        const sqlInsertNotifications: typeof sqlType = `
+        INSERT INTO notificacoes
+        (id, usuario_da_notificacao, nome_autor_like, pergunta_id)
+        VALUES (?, ?, ?, ?)
+        ` 
+
+        db.query(sqlSelectResposta, [resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err; 
+          const pergunta_ID = result[0]?.pergunta_ID;
+          const autor_resposta_name = result[0]?.autor_resposta_name;
+
+          if (autor_resposta_name === autor_like) {
+            db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
+              if (err) throw err;
+              return res.status(200).json({
+                comentario: JSON.stringify(result)
+              }) 
+          }) 
+          } else {
+            db.query(sqlInsertNotifications, [id, autor_resposta_name, autor_like, pergunta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+              if (err) throw err;
+              db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
+                if (err) throw err;
+                return res.status(200).json({
+                  comentario: JSON.stringify(result)
+                }) 
+              })                                   
+            })   
+          }
+          
+        })   
+
  
 
-        db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          return res.status(200).json({
-            comentario: JSON.stringify(result)
-          }) 
-        })                                   
       } 
 
       public listLikesAnswer (req: Request, res: Response) {

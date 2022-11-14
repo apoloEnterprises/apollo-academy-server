@@ -371,7 +371,7 @@ public async insertWatching(req: Request, res: Response) {
       WHERE nome=?
       `
 
-      const sqlSelectinsert: string = ` 
+      const sqlSelectinsert: typeof sqlType = ` 
       INSERT
       INTO usuario_curso_assistindo (id_usuario, id_curso, aula_assistindo, timestamp, total_timestamp)
       VALUES (?, ?, ?, ?, ?)

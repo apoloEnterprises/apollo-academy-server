@@ -466,10 +466,73 @@ class userController {
    })
   }
 
-  public async getNotfications (red: Request, res: Response) {
-    // const {
+  public async getNotfications (req: Request, res: Response) {
+    const {
+      usuario_da_notificacao
+    } = req.body;
 
-    // }
+    if (!usuario_da_notificacao) {
+      return res.status(404).send('User not found.')
+    }
+
+    const sqlNotificacoesLikes: typeof sqlType = `
+    SELECT * FROM notificacoes_likes
+    WHERE usuario_da_notificacao=?
+    ORDER BY data ASC
+    `  
+
+    const sqlNotificacoesComentario: typeof sqlType = `
+    SELECT * FROM notificacoes_comentario
+    WHERE usuario_da_notificacao=? 
+    ORDER BY data ASC
+
+    `  
+
+    const sqlNotificacoesResposta: typeof sqlType = `
+    SELECT * FROM notificacoes_resposta
+    WHERE usuario_da_notificacao=?
+    ORDER BY data ASC
+    `  
+    const sqlNotificacoes: typeof sqlType = `
+    SELECT * FROM notificacoes
+    WHERE usuario_da_notificacao=?
+    ORDER BY data DESC
+    `  
+
+    const sqlNotificacoeAll: typeof sqlType = `
+    SELECT DISTINCT notificacoes_likes.nome_autor_like, notificacoes_resposta.resposta_Txt
+    FROM notificacoes_resposta
+    JOIN notificacoes_comentario
+    ON notificacoes_resposta.usuario_da_notificacao = notificacoes_comentario.usuario_da_notificacao
+    JOIN notificacoes_likes
+    ON notificacoes_likes.usuario_da_notificacao = notificacoes_comentario.usuario_da_notificacao
+    WHERE notificacoes_comentario.usuario_da_notificacao = ? AND notificacoes_resposta.usuario_da_notificacao=? AND notificacoes_likes.usuario_da_notificacao=?
+    ORDER BY notificacoes_comentario.data AND notificacoes_resposta.data AND notificacoes_likes.data ASC
+    `  
+
+    db.query(sqlNotificacoesLikes, [usuario_da_notificacao], async function (err: Error, result: any) {
+      if (err) throw err;
+      const notificationsLikes = result;
+      db.query(sqlNotificacoes, [usuario_da_notificacao], async function (err: Error, result: any) {
+        if (err) throw err;
+        const notificationsComentario = result;
+
+        db.query(sqlNotificacoesResposta, [usuario_da_notificacao, usuario_da_notificacao, usuario_da_notificacao], async function (err: Error, result: any) {
+          if (err) throw err;
+          const notificationsRespsota = result;
+          const arr = [notificationsRespsota, notificationsComentario, notificationsLikes]
+          // const mapped = notificationsRespsota.map(i);
+           
+          return res.status(200).send(notificationsComentario)
+          // return res.status(200).json({ 
+          //   likes: notificationsLikes,
+          //   comentarios: notificationsComentario,
+          //   resposta: notificationsRespsota
+          // })
+       })
+     })
+   })
+
   }
 }
 

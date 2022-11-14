@@ -3,6 +3,7 @@ USE `apollo`;
 
 CREATE TABLE IF NOT EXISTS `perguntas` (
   `id` varchar(100) NOT NULL,
+  `data_to_order` TIMESTAMP DEFAULT NOW(),
   `data` varchar(100) NOT NULL,
   `autor_name` varchar(100) NOT NULL,
   `pergunta_Txt` varchar(255) NOT NULL,

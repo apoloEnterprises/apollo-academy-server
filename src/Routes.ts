@@ -6,7 +6,7 @@ const communityController = require('./controllers/communityController');
 const rankingsController = require('./controllers/rankingsController')
 const coursesController = require('./controllers/coursesController')
   
-// --------------------sign up routes-------------------------
+// -------------------- user routes-------------------------
 router.put('/sign-up/category', userController.index);
 router.post('/sign-up', userController.select);
 router.post('/sign-in', userController.getIn);
@@ -20,6 +20,7 @@ router.post('/show-fullname', userController.changeSettingShowFullname);
 router.post('/get-fullname-config', userController.getConfigFullname);
 router.post('/`get-slide-visto`', userController.findVistoSlide);
 router.post('/insert-slide-visto', userController.insertSlideVisto);
+router.post('/notifications', userController.getNotfications);
 // --------------------**********------------------------
     
 // -------- ------------community routes-------------------------
