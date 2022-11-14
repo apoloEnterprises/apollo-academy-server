@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `notificacoes` (
   `nome_autor_resposta` varchar(120),
   `resposta_Txt` varchar(855),
   `resposta_id` varchar(120),
-  `nome_autor_like` varchar(100),
+  `nome_autor_like` varchar(100), 
   `nome_autor_comentario` varchar(120),
   `comentario_Txt` varchar(120),
   PRIMARY KEY (`id`),

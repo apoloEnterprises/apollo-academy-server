@@ -10,45 +10,45 @@ const {
   ResultQueyResposta, 
   ResultQueyComment } = require('./types/shortResultTyped');
 
-const { nowDate } = require('./exports/getData')
+const { nowDate } = require('./exports/getData');
 
 class communityController {
- public async postIndex(req: Request, res: Response) {
+  public async postIndex(req: Request, res: Response) {
     const {
       autor_name,
       categoria,
       subCategoria,
       pergunta_Txt,
-      } = await req.body;
+    } = await req.body;
  
-      if (!autor_name || !categoria || !subCategoria || !pergunta_Txt) {
-        res.status(404).send('Error sir')
-      } 
+    if (!autor_name || !categoria || !subCategoria || !pergunta_Txt) {
+      res.status(404).send('Error sir');
+    } 
  
-      const data = nowDate;
+    const data = nowDate;
 
-      const id = uuidv4();
+    const id = uuidv4();
 
-      const sql: typeof sqlType = `INSERT INTO perguntas 
+    const sql: typeof sqlType = `INSERT INTO perguntas 
       (id, data, pergunta_Txt, autor_name, categoria,subCategoria) VALUES (?,?,?,?,?, ?) 
       `;
  
-      const sqlUser: typeof sqlType = `
+    const sqlUser: typeof sqlType = `
       SELECT nomeDeUsuario
       FROM usuarios 
       WHERE id=?
-      `  
+      `;  
 
 
-        db.query(sql, [id, data, pergunta_Txt, autor_name, categoria, subCategoria], async function (err: Error, result: typeof ResultQueyUser[]) {
-          if (err) throw err;
-          const re = await result[0];
-          db.query(sqlUser, [autor_name], async function (err: Error, result: any) {
-            if (err) throw err;
-            res.send(result[0])
-          })
-        })
-      }
+    db.query(sql, [id, data, pergunta_Txt, autor_name, categoria, subCategoria], async function (err: Error, result: typeof ResultQueyUser[]) {
+      if (err) throw err;
+      const re = await result[0];
+      db.query(sqlUser, [autor_name], async function (err: Error, result: any) {
+        if (err) throw err;
+        res.send(result[0]);
+      });
+    });
+  }
       
   public async getUserPosts(req: Request, res: Response) {
     const {
@@ -61,10 +61,10 @@ class communityController {
     SELECT pergunta_Txt, id FROM perguntas WHERE autor_name=?
     `;
 
-      db.query(sql, [id], async function (err: Error, result: typeof ResultQueyPost[]) {
-        if (err) throw err;
-        res.status(200).send(JSON.stringify(result))
-      })
+    db.query(sql, [id], async function (err: Error, result: typeof ResultQueyPost[]) {
+      if (err) throw err;
+      res.status(200).send(JSON.stringify(result));
+    });
   }
 
   public async getPostByCategory(req: Request, res: Response) {
@@ -86,7 +86,7 @@ class communityController {
     `;
 
     if (!categoria && !subCategoria) {
-      res.status(404).send('Category not found.')
+      res.status(404).send('Category not found.');
     }
 
     if(subCategoria === 'Selecionar filtro') {
@@ -95,16 +95,16 @@ class communityController {
           if (err) throw err;
           // const user = result[0].autor_name
           // const re = result[0]
-          res.status(200).send(result)
-        })
+          res.status(200).send(result);
+        });
     } else {
       db.query(sql2, [categoria, subCategoria], 
         async function (err: Error, result: typeof ResultQueyCateogry[]) {
           if (err) throw err;
           // const user = result[0].autor_name
           // const re = result[0]
-                   res.status(200).send(result)
-        })
+          res.status(200).send(result);
+        });
     }
     
 
@@ -148,10 +148,10 @@ class communityController {
           const postCount = result.length;
           res.status(200).json({
             Total: `${postCount}`
-          })
-        })
+          });
+        });
     } else {
-      res.status(404).send('Category not found.')
+      res.status(404).send('Category not found.');
     }
   }
 
@@ -173,10 +173,10 @@ class communityController {
           const postCount = result.length;
           res.status(200).json({
             numero_respostas: `${postCount}`
-          })
-        })
+          });
+        });
     } else {
-      res.status(404).send('Answers not found.')
+      res.status(404).send('Answers not found.');
     }
   }
  
@@ -185,67 +185,67 @@ class communityController {
       pergunta_ID,
       autor_resposta_name,
       resposta_Txt,
-      } = await req.body;
+    } = await req.body;
   
-      if (!autor_resposta_name) {
-        res.status(404).send('Error sir')
-      } 
+    if (!autor_resposta_name) {
+      res.status(404).send('Error sir');
+    } 
  
-      const data = nowDate;
+    const data = nowDate;
   
-      const id = uuidv4();
-      const idNotification = uuidv4();
+    const id = uuidv4();
+    const idNotification = uuidv4();
   
-      const sql: typeof sqlType = `INSERT INTO respostas 
+    const sql: typeof sqlType = `INSERT INTO respostas 
       (id, data, pergunta_ID, autor_resposta_name, resposta_Txt) VALUES (?,?,?, ?,?)
       `;  
  
-      const sqlGetNumberAnswers: typeof sqlType = `
+    const sqlGetNumberAnswers: typeof sqlType = `
       SELECT *
       FROM respostas
       WHERE pergunta_ID=?`; 
   
-      const sqlSelectPergunta: typeof sqlType = `
+    const sqlSelectPergunta: typeof sqlType = `
       SELECT autor_name
       FROM perguntas
       WHERE id=?
-      `
+      `;
 
-      const sqlInsertNotifications: typeof sqlType = `
+    const sqlInsertNotifications: typeof sqlType = `
       INSERT INTO notificacoes
       (id, usuario_da_notificacao, nome_autor_resposta, resposta_Txt, pergunta_id, resposta_id)
-      VALUES (?, ?, ?, ?, ?, ?)`
+      VALUES (?, ?, ?, ?, ?, ?)`;
    
-      db.query(sqlSelectPergunta, [pergunta_ID], 
-        async function (err: Error, result: typeof ResultQueyResposta[]) {
+    db.query(sqlSelectPergunta, [pergunta_ID], 
+      async function (err: Error, result: typeof ResultQueyResposta[]) {
+        if (err) throw err;
+        const autor_pergunta_name = result[0]?.autor_name;
+        db.query(sql, [id,  data, pergunta_ID, autor_resposta_name, resposta_Txt], function (err: Error, result: typeof ResultQueyResposta[]) {
           if (err) throw err;
-          const autor_pergunta_name = result[0]?.autor_name;
-          db.query(sql, [id,  data, pergunta_ID, autor_resposta_name, resposta_Txt], function (err: Error, result: typeof ResultQueyResposta[]) {
-            if (err) throw err;
-            const queryResult = result[0];
-            db.query(sqlGetNumberAnswers, [pergunta_ID], 
-              async function (err: Error, result: typeof ResultQueyResposta[]) {
-                if (err) throw err;
+          const queryResult = result[0];
+          db.query(sqlGetNumberAnswers, [pergunta_ID], 
+            async function (err: Error, result: typeof ResultQueyResposta[]) {
+              if (err) throw err;
 
-                if (autor_pergunta_name === autor_resposta_name) {
-                  return res.status(200).send(queryResult)
-                } else {
-                  db.query(sqlInsertNotifications, [idNotification, autor_pergunta_name, autor_resposta_name, resposta_Txt, pergunta_ID, id], 
-                    async function (err: Error, result: typeof ResultQueyResposta[]) {
-                      if (err) throw err;
-                      return res.status(200).send(queryResult)
-                })
+              if (autor_pergunta_name === autor_resposta_name) {
+                return res.status(200).send(queryResult);
+              } else {
+                db.query(sqlInsertNotifications, [idNotification, autor_pergunta_name, autor_resposta_name, resposta_Txt, pergunta_ID, id], 
+                  async function (err: Error, result: typeof ResultQueyResposta[]) {
+                    if (err) throw err;
+                    return res.status(200).send(queryResult);
+                  });
               }
-              
-            })}  
-          ) 
-        })
-      }
+
+            });}  
+        ); 
+      });
+  }
   
-      public async getPostAndAnswers (req: Request, res: Response) {
-        const {
-          id
-        } = await req.params;
+  public async getPostAndAnswers (req: Request, res: Response) {
+    const {
+      id
+    } = await req.params;
     
         type sqlType = string;
 
@@ -270,271 +270,271 @@ class communityController {
 
         if (id) {
           db.query(sql, [id], 
-             async function (err: Error, result: typeof ResultQueyPost[]) {
+            async function (err: Error, result: typeof ResultQueyPost[]) {
               if (err) throw err;
-              const postResult = result
+              const postResult = result;
+              db.query(sqlAnswer, [id], function (err: Error, result: typeof ResultQueyResposta[]) {
+                if (err) throw err;
+                const postAnswer = result;
                 db.query(sqlAnswer, [id], function (err: Error, result: typeof ResultQueyResposta[]) {
                   if (err) throw err;
-                  const postAnswer = result
-                    db.query(sqlAnswer, [id], function (err: Error, result: typeof ResultQueyResposta[]) {
-                      if (err) throw err;
-                      const answerComment = result
-                      res.status(200).json({
-                        pergunta: postResult,
-                        respostas: postAnswer
-                      });
+                  const answerComment = result;
+                  res.status(200).json({
+                    pergunta: postResult,
+                    respostas: postAnswer
                   });
+                });
               });
             });
         } else {
-          res.status(404).send('Question not found.')
+          res.status(404).send('Question not found.');
         }
-      }
+  }
 
-      public async postComment(req: Request, res: Response) {
-        const {
-          resposta_ID,
-          autor_ID,
-          comentario_Txt
-        } = req.body;
+  public async postComment(req: Request, res: Response) {
+    const {
+      resposta_ID,
+      autor_ID,
+      comentario_Txt
+    } = req.body;
  
-        if (!autor_ID) {
-          res.status(404).send('No user id provided.')
-        }
+    if (!autor_ID) {
+      res.status(404).send('No user id provided.');
+    }
    
-        const id = uuidv4();
+    const id = uuidv4();
 
-        const data = nowDate;
+    const data = nowDate;
   
-        const sql: typeof sqlType = `INSERT INTO comentarios 
-        (id, resposta_ID, data, autor_ID, comentario_Txt) VALUES (?,?,?, ?, ?)`
+    const sql: typeof sqlType = `INSERT INTO comentarios 
+        (id, resposta_ID, data, autor_ID, comentario_Txt) VALUES (?,?,?, ?, ?)`;
 
-        const sqlSelectResposta: typeof sqlType = `
+    const sqlSelectResposta: typeof sqlType = `
         SELECT pergunta_ID, autor_resposta_name
         FROM respostas
         WHERE id=?
-        `
+        `;
 
         
-        const sqlSelectUser: typeof sqlType = `
+    const sqlSelectUser: typeof sqlType = `
         SELECT nomeDeUsuario
         FROM usuarios
         WHERE nomeDeUsuario=?
-        `
-        const sqlInsertNotifications: typeof sqlType = `
+        `;
+    const sqlInsertNotifications: typeof sqlType = `
         INSERT INTO notificacoes
         (id, usuario_da_notificacao, nome_autor_comentario, 
           comentario_Txt, pergunta_id)
         VALUES (?, ?, ?, ?, ?)
-        ` 
+        `; 
 
 
 
-          db.query(sqlSelectResposta, [resposta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+    db.query(sqlSelectResposta, [resposta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err;
+      const pergunta_id = result[0]?.pergunta_ID;
+      const autor_resposta_name = result[0]?.autor_resposta_name;
+
+      if (autor_resposta_name === autor_ID) {
+        db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function
+        (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          return res.status(200).json({
+            comentario: JSON.stringify(result)
+          });
+        });
+      } else {
+        db.query(sqlInsertNotifications, [id, autor_resposta_name, autor_ID, comentario_Txt, pergunta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+  
+          db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function
+          (err: Error, result: typeof ResultQueyComment[]) {
             if (err) throw err;
-            const pergunta_id = result[0]?.pergunta_ID;
-            const autor_resposta_name = result[0]?.autor_resposta_name;
-
-            if (autor_resposta_name === autor_ID) {
-              db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function
-                (err: Error, result: typeof ResultQueyComment[]) {
-                if (err) throw err;
-                return res.status(200).json({
-                  comentario: JSON.stringify(result)
-                })
-              })
-            } else {
-              db.query(sqlInsertNotifications, [id, autor_resposta_name, autor_ID, comentario_Txt, pergunta_id], function (err: Error, result: typeof ResultQueyComment[]) {
-                if (err) throw err;
-  
-                db.query(sql, [id, resposta_ID, data, autor_ID, comentario_Txt], function
-                  (err: Error, result: typeof ResultQueyComment[]) {
-                  if (err) throw err;
-                  return res.status(200).json({
-                    comentario: JSON.stringify(result)
-                  })
-                })
-              })
-            }
-          })
+            return res.status(200).json({
+              comentario: JSON.stringify(result)
+            });
+          });
+        });
       }
+    });
+  }
 
-      public async getCommentAnswer(req: Request, res: Response) {
-        const {
-          resposta_ID
-        } = req.params;
+  public async getCommentAnswer(req: Request, res: Response) {
+    const {
+      resposta_ID
+    } = req.params;
  
-        if (!resposta_ID) {
-          res.status(404).send('No user id provided.')
-        }
+    if (!resposta_ID) {
+      res.status(404).send('No user id provided.');
+    }
   
-        const sql: typeof sqlType = `
+    const sql: typeof sqlType = `
         SELECT * 
         FROM comentarios
         WHERE resposta_ID=? 
-        `
+        `;
 
-        db.query(sql, [resposta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          res.status(200).send(result)
-        })
-      }
+    db.query(sql, [resposta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err;
+      res.status(200).send(result);
+    });
+  }
 
 
 
-      public async postCommentToQuestion(req: Request, res: Response) {
-        const {
-          pergunta_ID,
-          autor_name,
-          comentario_Txt
-        } = req.body;
+  public async postCommentToQuestion(req: Request, res: Response) {
+    const {
+      pergunta_ID,
+      autor_name,
+      comentario_Txt
+    } = req.body;
  
-        if (!autor_name) {
-          res.status(404).send('No user id provided.')
-        }
+    if (!autor_name) {
+      res.status(404).send('No user id provided.');
+    }
   
-        const id = uuidv4();
+    const id = uuidv4();
 
-        const data = nowDate;
+    const data = nowDate;
 
-        const sql: typeof sqlType = `INSERT INTO comentario_pergunta 
-        (id, pergunta_ID, data, autor_name, comentario_Txt) VALUES (?,?,?, ?, ?)`
+    const sql: typeof sqlType = `INSERT INTO comentario_pergunta 
+        (id, pergunta_ID, data, autor_name, comentario_Txt) VALUES (?,?,?, ?, ?)`;
 
-        db.query(sql, [id, pergunta_ID, data, autor_name, comentario_Txt], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          res.status(200).json({
-            comentario: JSON.stringify(result)
-          })
-        })
-      }
+    db.query(sql, [id, pergunta_ID, data, autor_name, comentario_Txt], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err;
+      res.status(200).json({
+        comentario: JSON.stringify(result)
+      });
+    });
+  }
 
-      public async getCommentsQuestion(req: Request, res: Response) {
-        const {
-          pergunta_ID
-        } = req.params;
+  public async getCommentsQuestion(req: Request, res: Response) {
+    const {
+      pergunta_ID
+    } = req.params;
  
-        if (!pergunta_ID) {
-          res.status(404).send('No user id provided.')
-        }
+    if (!pergunta_ID) {
+      res.status(404).send('No user id provided.');
+    }
   
-        const sql: typeof sqlType = `
+    const sql: typeof sqlType = `
         SELECT comentario_Txt
         FROM comentario_pergunta
         WHERE pergunta_ID=?
-        `
+        `;
 
-        db.query(sql, [pergunta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          res.status(200).send(result)
-        })
-      }
+    db.query(sql, [pergunta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err;
+      res.status(200).send(result);
+    });
+  }
    
-      public async likeAnswer (req: Request, res: Response) {
-        const {
-          resposta_id,
-          autor_like
-        } = req.body;
+  public async likeAnswer (req: Request, res: Response) {
+    const {
+      resposta_id,
+      autor_like
+    } = req.body;
  
-        if(!resposta_id || !autor_like) {
-          res.status(404).send('Data not found.')
-        }
+    if(!resposta_id || !autor_like) {
+      res.status(404).send('Data not found.');
+    }
       
-        const id = uuidv4();
+    const id = uuidv4();
    
-        const data = nowDate;
+    const data = nowDate;
 
-        const sql: typeof sqlType = `
+    const sql: typeof sqlType = `
         INSERT INTO respostas_likes 
-        (id, data, resposta_id, autor_like) VALUES (?,?,?,?)`
+        (id, data, resposta_id, autor_like) VALUES (?,?,?,?)`;
 
-        const sqlSelectResposta: typeof sqlType = `
+    const sqlSelectResposta: typeof sqlType = `
         SELECT pergunta_ID, autor_resposta_name
         FROM respostas
         WHERE id=?
-        `
+        `;
 
-        const sqlInsertNotifications: typeof sqlType = `
+    const sqlInsertNotifications: typeof sqlType = `
         INSERT INTO notificacoes
         (id, usuario_da_notificacao, nome_autor_like, pergunta_id)
         VALUES (?, ?, ?, ?)
-        ` 
+        `; 
 
-        db.query(sqlSelectResposta, [resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err; 
-          const pergunta_ID = result[0]?.pergunta_ID;
-          const autor_resposta_name = result[0]?.autor_resposta_name;
+    db.query(sqlSelectResposta, [resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err; 
+      const pergunta_ID = result[0]?.pergunta_ID;
+      const autor_resposta_name = result[0]?.autor_resposta_name;
 
-          if (autor_resposta_name === autor_like) {
-            db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
-              if (err) throw err;
-              return res.status(200).json({
-                comentario: JSON.stringify(result)
-              }) 
-          }) 
-          } else {
-            db.query(sqlInsertNotifications, [id, autor_resposta_name, autor_like, pergunta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
-              if (err) throw err;
-              db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
-                if (err) throw err;
-                return res.status(200).json({
-                  comentario: JSON.stringify(result)
-                }) 
-              })                                   
-            })   
-          }
+      if (autor_resposta_name === autor_like) {
+        db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          return res.status(200).json({
+            comentario: JSON.stringify(result)
+          }); 
+        }); 
+      } else {
+        db.query(sqlInsertNotifications, [id, autor_resposta_name, autor_like, pergunta_ID], function (err: Error, result: typeof ResultQueyComment[]) {
+          if (err) throw err;
+          db.query(sql, [id, data, resposta_id, autor_like], function (err: Error, result: typeof ResultQueyComment[]) {
+            if (err) throw err;
+            return res.status(200).json({
+              comentario: JSON.stringify(result)
+            }); 
+          });                                   
+        });   
+      }
           
-        })   
+    });   
 
  
 
-      } 
+  } 
 
-      public listLikesAnswer (req: Request, res: Response) {
-        const {
-          resposta_id
-        } = req.params;
+  public listLikesAnswer (req: Request, res: Response) {
+    const {
+      resposta_id
+    } = req.params;
 
-        if (!resposta_id) {
-          res.status(404).send('Data not found.')
-        }
+    if (!resposta_id) {
+      res.status(404).send('Data not found.');
+    }
  
-        const sql: typeof sqlType = `
+    const sql: typeof sqlType = `
         SELECT autor_like
         FROM respostas_likes
         WHERE resposta_id=?
-        `
+        `;
 
-        db.query(sql, [resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          res.status(200).json({
-            likes: result.length
-          })
-        }) 
-      }
+    db.query(sql, [resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err;
+      res.status(200).json({
+        likes: result.length
+      });
+    }); 
+  }
 
-      public listSelfLikesAnswer (req: Request, res: Response) {
-        const {
-          autor_like,
-          resposta_id
-        } = req.params;
+  public listSelfLikesAnswer (req: Request, res: Response) {
+    const {
+      autor_like,
+      resposta_id
+    } = req.params;
 
-        if (!autor_like || !resposta_id) {
-          res.status(404).send('Data not found.')
-        }
+    if (!autor_like || !resposta_id) {
+      res.status(404).send('Data not found.');
+    }
  
-        const sql: typeof sqlType = `
+    const sql: typeof sqlType = `
         SELECT autor_like
         FROM respostas_likes
         WHERE (autor_like=? AND resposta_id=?)
-        `
+        `;
 
-        db.query(sql, [autor_like, resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
-          if (err) throw err;
-          res.status(200).json({
-            likes: result.length
-          })
-        }) 
-      } 
+    db.query(sql, [autor_like, resposta_id], function (err: Error, result: typeof ResultQueyComment[]) {
+      if (err) throw err;
+      res.status(200).json({
+        likes: result.length
+      });
+    }); 
+  } 
 
 }
 

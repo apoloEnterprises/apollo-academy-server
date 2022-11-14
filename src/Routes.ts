@@ -3,8 +3,8 @@ const { Router } = require('express');
 const router = Router();
 const userController = require('./controllers/userController');
 const communityController = require('./controllers/communityController');
-const rankingsController = require('./controllers/rankingsController')
-const coursesController = require('./controllers/coursesController')
+const rankingsController = require('./controllers/rankingsController');
+const coursesController = require('./controllers/coursesController');
   
 // -------------------- user routes-------------------------
 router.put('/sign-up/category', userController.index);
