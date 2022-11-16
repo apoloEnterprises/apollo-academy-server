@@ -5,7 +5,7 @@ const userController = require('./controllers/userController');
 const communityController = require('./controllers/communityController');
 const rankingsController = require('./controllers/rankingsController');
 const coursesController = require('./controllers/coursesController');
-  
+
 // -------------------- user routes-------------------------
 router.put('/sign-up/category', userController.index);
 router.post('/sign-up', userController.select);
@@ -68,7 +68,9 @@ router.get('/get-media-nota/:id_curso', coursesController.getMediaNota);
 router.get('/get-alunos/:id_aluno', coursesController.getNumAlunos);  
 router.get('/get-courses-feed', coursesController.returnCursoFeed); 
 router.get('/get-aluno-cursos/:id', coursesController.getAlunoCursos);   
-router.get('/get-liked', coursesController.getliked);   
+router.get('/get-liked/:id_aluno', coursesController.getliked);   
+router.get('/get-downloads/:id_aluno', coursesController.getDownloads);   
+router.get('/get-liked-course/:id_aluno/:nome_curso', coursesController.getLikedFromName);   
   
 // router.post('/aula-1', coursesController.hostCourse);
 // --------------------**********------------------------

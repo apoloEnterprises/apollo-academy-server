@@ -545,22 +545,28 @@ class coursesController {
   public async insertIntoMyFavList (req: Request, res: Response) {
     const {
       id_aluno,
-      nome_curso
+      item,
+      descricao,
+      img,
+      nome,
+      category1,
+      category2,
+      category3
     } = req.body;
 
-    if (!id_aluno || !nome_curso) {
+    if (!id_aluno || !item || !descricao || !img || !nome || !category1 || !category2 || !category3) {
       return res.status(404).send('No data provided');
     }
-
+    
     const id = uuidv4();
 
 
     const sqlInsertInto: typeof sqlType = `
-      INSERT INTO curso_favorito (id, nome_curso, id_aluno)
-      VALUES (?,?,?)  
+      INSERT INTO curso_favorito (id, item, descricao, img, nome, category1, category2, category3, id_aluno)
+      VALUES (?,?,?,?,?,?,?,?,?)  
       `;
 
-    db.query(sqlInsertInto, [id, nome_curso, id_aluno], async function (err: Error, result: any) {
+    db.query(sqlInsertInto, [id, item, descricao, img, nome, category1, category2, category3, id_aluno], async function (err: Error, result: any) {
       if (err) throw err;
       return res.status(200).json({
         re: result
@@ -572,10 +578,21 @@ class coursesController {
   public async insertIntoDownload (req: Request, res: Response) {
     const {
       id_aluno,
-      nome_curso
+      item,
+      descricao,
+      img,
+      nome,
+      category1,
+      category2,
+      category3
     } = req.body;
 
-    if (!id_aluno || !nome_curso) {
+    console.log();
+    console.log(item);
+    console.log();
+    
+
+    if (!id_aluno || !item || !descricao || !img || !nome || !category1 || !category2 || !category3) {
       return res.status(404).send('No data provided');
     }
 
@@ -583,11 +600,11 @@ class coursesController {
       
 
     const sqlInsertInto: typeof sqlType = `
-      INSERT INTO curso_download (id, id_aluno, nome_curso)
-      VALUES (?,?,?)  
+      INSERT INTO curso_download (id, item, descricao, img, nome, category1, category2, category3, id_aluno)
+      VALUES (?,?,?,?,?,?,?,?,?)  
       `;
       
-    db.query(sqlInsertInto, [id, id_aluno, nome_curso], async function (err: Error, result: any) {
+    db.query(sqlInsertInto, [id, item, descricao, img, nome, category1, category2, category3, id_aluno], async function (err: Error, result: any) {
       if (err) throw err;
       return res.status(200).json({
         re: result
@@ -595,50 +612,27 @@ class coursesController {
     });
   }
 
-  public async getMyList(req: Request, res: Response) {
-    const {
-      id_aluno,
-    } = req.params;
-
-    if (!id_aluno) {
-      return res.status(404).send('No data provided');
-    }
-
-
-    const sqlSelect: typeof sqlType = `
-      SELECTT *
-      FROM curso_favorito
-      WHERE id_aluno=?
-      `;
-
-    db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
-      if (err) throw err;
-      return res.status(200).send(result);
-    });
-
-  }
-
   public async getDownloads(req: Request, res: Response) {
     const {
-      id_aluno,
+      id_aluno
     } = req.params;
 
+  
     if (!id_aluno) {
-      return res.status(404).send('No data provided');
-    }
-
+      return res.status(404).send('No data provided.');
+    } 
 
     const sqlSelect: typeof sqlType = `
-      SELECTT *
+      SELECT *
       FROM curso_download
       WHERE id_aluno=?
       `;
-
+ 
     db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
       if (err) throw err;
       return res.status(200).send(result);
-    });
-
+    }); 
+      
   }
 
   public async getTime(req: Request, res: Response) {
@@ -665,26 +659,59 @@ class coursesController {
  
   public async getliked(req: Request, res: Response) {
     const {
-      id_aluno,
-      nome_curso
-    } = req.body;
+      id_aluno
+    } = req.params;
 
-    if (!nome_curso || !id_aluno) {
+  
+    if (!id_aluno) {
       return res.status(404).send('No data provided.');
     } 
-     
+
     const sqlSelect: typeof sqlType = `
       SELECT *
       FROM curso_favorito
-      WHERE (nome_curso=? AND id_aluno=?)
+      WHERE id_aluno=?
       `;
 
-    db.query(sqlSelect, [nome_curso, id_aluno], async function (err: Error, result: any) {
+    db.query(sqlSelect, [id_aluno], async function (err: Error, result: any) {
       if (err) throw err;
       return res.status(200).send(result);
     }); 
       
   }
+
+  public async getLikedFromName(req: Request, res: Response) {
+    const {
+      id_aluno,
+      nome_curso
+    } = req.params;
+    console.log(nome_curso);
+
+
+    if (!id_aluno || !nome_curso) {
+      return res.status(404).send('No data found.');
+    }
+
+    const sqlSelect: typeof sqlType = `
+    SELECT *
+    FROM curso_favorito
+    WHERE id_aluno=? AND nome=?
+    `;
+
+    db.query(sqlSelect, [id_aluno, nome_curso], async function (err: Error, result: any) {
+      if (err) throw err;
+      if (result.length >= 1 ) {
+        return res.status(200).json({
+          isFav: true
+        });
+      } else {
+        return res.status(200).json({
+          isFav: false
+        });
+      }
+    }); 
+  }
+
 }
 
 module.exports = new coursesController();

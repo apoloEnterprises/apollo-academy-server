@@ -2,7 +2,6 @@ import { log } from 'console';
 import { Request, Response } from 'express';
 import { send } from 'process';
 const db = require('../database/db');
-const userRepository = require('../repository/userRepository');
 const { v4: uuidv4 } = require('uuid');
 const sqlType = require('./types/sqlTyped');
 const {
