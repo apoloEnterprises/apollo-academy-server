@@ -279,7 +279,7 @@ class communityController {
                 db.query(sqlAnswer, [id], function (err: Error, result: typeof ResultQueyResposta[]) {
                   if (err) throw err;
                   const answerComment = result;
-                  res.status(200).json({
+                  return res.status(200).json({
                     pergunta: postResult,
                     respostas: postAnswer
                   });
@@ -287,7 +287,7 @@ class communityController {
               });
             });
         } else {
-          res.status(404).send('Question not found.');
+          return res.status(404).send('Question not found.');
         }
   }
 

@@ -27,9 +27,7 @@ router.post('/notifications', userController.getNotfications);
 router.post('/community/create-post', communityController.postIndex);
 router.get('/community/post/:id', communityController.getUserPosts);
 router.get('/community/posts/:categoria/:subCategoria', communityController.getPostByCategory);
-// number of all posts in that category
 router.post('/community/post-total', communityController.getPostNumber);
-// number of total answers in a post
 router.get('/community/post-total-answer/:id', communityController.getPostTotalAnswersNumber);
 router.post('/community/post-create-answer', communityController.postAnwser);
 router.post('/community/like-comment', communityController.likeAnswer);
@@ -71,6 +69,7 @@ router.get('/get-aluno-cursos/:id', coursesController.getAlunoCursos);
 router.get('/get-liked/:id_aluno', coursesController.getliked);   
 router.get('/get-downloads/:id_aluno', coursesController.getDownloads);   
 router.get('/get-liked-course/:id_aluno/:nome_curso', coursesController.getLikedFromName);   
+router.get('/get-downloaded-course/:id_aluno/:nome_curso', coursesController.getDownloadFromName);   
   
 // router.post('/aula-1', coursesController.hostCourse);
 // --------------------**********------------------------

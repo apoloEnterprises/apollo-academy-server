@@ -56,6 +56,11 @@ class userController {
       email, 
       senha,
     } = req.body;
+    console.log(nomeDeUsuario);
+
+    if (!nomeDeUsuario) {
+      return res.status(404).send('No user provided.');
+    } 
 
     interface ResultQuey {
       id: number,
@@ -68,24 +73,21 @@ class userController {
 
     const password = sha256(senha);
 
-    if (!nomeDeUsuario) {
-      res.status(404).send('No user provided.');
-    }
 
     db.query('SELECT nomeDeUsuario FROM usuarios WHERE nomeDeUsuario=?', [nomeDeUsuario], function (err: Error, result: ResultQuey[]) {
       if (err) throw err;
       if (result[0]?.nomeDeUsuario.length > 0 ) {
-        res.status(401).send('Username already in use.');
+        return res.status(401).send('Username already in use.');
       }
       db.query('SELECT email FROM usuarios WHERE email=?', [email], async function (err: Error, result: ResultQuey[]) {
         if (err) throw err;
         if ( result[0]?.email.length > 0 ) {
-          res.status(401).send('Email already in use.');
+          return res.status(401).send('Email already in use.');
         } else {
           db.query(`INSERT INTO usuarios
         (id, nomeDeUsuario, email, senha) VALUES (?,?,?,?)`, [id, nomeDeUsuario, email, password], async function (err: Error, result: ResultQuey[]) {
             if (err) throw err;
-            res.status(200).json({
+            return res.status(200).json({
               status: nomeDeUsuario,
               id
             });      
@@ -114,20 +116,19 @@ class userController {
     WHERE nomeDeUsuario=?
     `;
 
-    const senhauuid = sha256(JSON.stringify(senha));
+    const senhauuid = sha256(senha);
 
     
 
     if(!nomeDeUsuario) {
-      res.status(404).send('Email or username not found.');
-      return;
+      return res.status(404).send('Email or username not found.');
     }
 
     db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
       if (err) {
         console.log(err);
         res.sendStatus(500);
-        return;
+        return; 
       }
 
       const ResultUsername = result[0]?.nomeDeUsuario;
@@ -141,10 +142,9 @@ class userController {
         }); 
         return;
       } else {
-        res.status(400).send({
+        return res.status(400).send({
           status: 'Username or password is not valid.'
         });
-        return;
       }
     });
   }

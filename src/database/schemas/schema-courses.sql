@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `curso_aulas` (
    `id` varchar(255) UNIQUE NOT NULL,
    `id_curso` varchar(255),
    `id_modulo` varchar(255),
-   `aula_nome` varchar(255) UNIQUE NOT NULL,
+   `aula_nome` varchar(255) NOT NULL,
    `video` varchar(255) NOT NULL,
    `duracao_total` varchar(255),
   PRIMARY KEY (`id`),
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS `curso_aulas` (
 CREATE TABLE IF NOT EXISTS `curso_modulos` (
    `id` varchar(255) UNIQUE NOT NULL,
    `id_curso` varchar(255),
-   `nome_modulo` varchar(255) UNIQUE NOT NULL,
-   `modulo_ordem` varchar(255) UNIQUE NOT NULL,
+   `nome_modulo` varchar(255) NOT NULL,
+   `modulo_ordem` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_curso`) REFERENCES curso(id) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

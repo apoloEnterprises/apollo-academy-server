@@ -314,7 +314,7 @@ class coursesController {
       if (err) throw err;
        
       return res.json({
-        aulas: result
+        aulas: result[1]
       });
     });
       
@@ -696,7 +696,7 @@ class coursesController {
     SELECT *
     FROM curso_favorito
     WHERE id_aluno=? AND nome=?
-    `;
+    `; 
 
     db.query(sqlSelect, [id_aluno, nome_curso], async function (err: Error, result: any) {
       if (err) throw err;
@@ -707,6 +707,37 @@ class coursesController {
       } else {
         return res.status(200).json({
           isFav: false
+        });
+      }
+    }); 
+  }
+
+  public async getDownloadFromName(req: Request, res: Response) {
+    const {
+      id_aluno,
+      nome_curso
+    } = req.params;
+
+
+    if (!id_aluno || !nome_curso) {
+      return res.status(404).send('No data found.');
+    }
+
+    const sqlSelect: typeof sqlType = `
+    SELECT *
+    FROM curso_download
+    WHERE id_aluno=? AND nome=?
+    `; 
+
+    db.query(sqlSelect, [id_aluno, nome_curso], async function (err: Error, result: any) {
+      if (err) throw err;
+      if (result.length >= 1 ) {
+        return res.status(200).json({
+          isDownloaded: true
+        });
+      } else {
+        return res.status(200).json({
+          isDownloaded: false
         });
       }
     }); 
