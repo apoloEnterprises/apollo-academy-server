@@ -75,4 +75,4 @@ router.get('/get-downloaded-course/:id_aluno/:nome_curso', coursesController.get
 // --------------------**********------------------------
 
 
-module.exports = router;
+module.exports = router; 
