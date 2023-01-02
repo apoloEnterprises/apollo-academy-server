@@ -8,6 +8,7 @@ const {
   ResultQueyUser,ResultQueyPost} = require('./types/resultTyped');
 const {  ResultQueryInsertCategory } = require('./types/shortResultTyped');
 const sha256 = require('sha256');
+const userRepository = require('../repository/userRepository');
  
 // user first actions - login, sign up, first choice of cateogries etc..
    
@@ -101,52 +102,40 @@ class userController {
       nomeDeUsuario,
       senha
     } = req.body;
-    
- 
-    interface ResultQuey {
-      id: number,
-      nomeDeUsuario: string,
-      senha: string,
-      email: string,
-    }
-
-    const sql: typeof sqlType = `
-    SELECT id, nomeDeUsuario, email, senha
-    FROM usuarios
-    WHERE nomeDeUsuario=?
-    `;
-
+  
     const senhauuid = sha256(senha);
-
-    
 
     if(!nomeDeUsuario) {
       return res.status(404).send('Email or username not found.');
     }
 
-    db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
-      if (err) {
-        console.log(err);
-        res.sendStatus(500);
-        return; 
-      }
+    const resultQuery = await userRepository.index(nomeDeUsuario, senhauuid);
+    console.log(`variabvel: ${resultQuery}`);
+    res.json(resultQuery);
+ 
+    // db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
+    //   if (err) {
+    //     console.log(err);
+    //     res.sendStatus(500);
+    //     return; 
+    //   }
 
-      const ResultUsername = result[0]?.nomeDeUsuario;
-      const ResultPassword = result[0]?.senha;
-      const resultid = result[0]?.id;
+    //   const ResultUsername = result[0]?.nomeDeUsuario;
+    //   const ResultPassword = result[0]?.senha;
+    //   const resultid = result[0]?.id;
 
-      if(nomeDeUsuario === ResultUsername && senhauuid === ResultPassword) {
-        res.status(200).send({
-          status: nomeDeUsuario,
-          id: resultid
-        }); 
-        return;
-      } else {
-        return res.status(400).send({
-          status: 'Username or password is not valid.'
-        });
-      }
-    });
+    //   if(nomeDeUsuario === ResultUsername && senhauuid === ResultPassword) {
+    //     res.status(200).send({
+    //       status: nomeDeUsuario,
+    //       id: resultid
+    //     }); 
+    //     return;
+    //   } else {
+    //     return res.status(400).send({
+    //       status: 'Username or password is not valid.'
+    //     });
+    //   }
+    // });
   }
 
   public async handleFeed(req: Request, res: Response) {
