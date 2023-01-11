@@ -1,10 +1,13 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const db = mysql.createConnection({
+const bluebird = require('bluebird');
+
+const db = await mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'sql',
   database: 'apollo',
+  Promise: bluebird
 });
 
 db.connect((error: string): void => {
@@ -16,4 +19,4 @@ db.connect((error: string): void => {
 });
 
 
-module.exports = db;
+module.exports = db; 

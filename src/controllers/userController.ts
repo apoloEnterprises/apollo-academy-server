@@ -97,7 +97,7 @@ class userController {
     ); 
   }  
  
-  public async getIn(req: Request, res: Response) {
+  async getIn(req: Request, res: Response) {
     const {
       nomeDeUsuario,
       senha
@@ -109,9 +109,11 @@ class userController {
       return res.status(404).send('Email or username not found.');
     }
 
-    const resultQuery = await userRepository.index(nomeDeUsuario, senhauuid);
+    const resultQuery = await userRepository.index(nomeDeUsuario);
     console.log(`variabvel: ${resultQuery}`);
-    res.json(resultQuery);
+    return res.json({
+      data: resultQuery
+    });
  
     // db.query(sql, [nomeDeUsuario], async function (err: Error, result: ResultQuey[]) {
     //   if (err) {
